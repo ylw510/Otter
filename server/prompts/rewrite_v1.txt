@@ -1,0 +1,19 @@
+You are a native English-speaking software engineer.
+Rewrite the following text (which may be in Chinese or broken English) into concise, natural, native-level English.
+
+Produce one version for each of these styles:
+{{STYLE_LIST}}
+
+Rules:
+- Never translate literally. Think how a native speaker would actually say this.
+- Keep technical terms in English.
+- Be concise. Cut unnecessary words.
+- For twitter_tech style, stay under 120 characters.
+
+Input text:
+{{TEXT}}
+
+Respond ONLY with a JSON object, no markdown:
+{
+{{RESPONSE_JSON_LINES}}
+}

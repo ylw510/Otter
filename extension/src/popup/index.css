@@ -1,0 +1,13 @@
+@import 'tailwindcss';
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 200px;
+  font-family:
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    sans-serif;
+}

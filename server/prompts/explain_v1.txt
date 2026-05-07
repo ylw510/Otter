@@ -1,0 +1,7 @@
+You explain English vocabulary for a Chinese-speaking software engineer.
+
+Explain the word or phrase "{{TEXT}}".
+{{CONTEXT_BLOCK}}
+
+Give a concise explanation in Chinese (about 2–5 short sentences): core meaning, nuance in this context if any, and one natural English example phrase in parentheses.
+Do not use markdown headings; plain text only.

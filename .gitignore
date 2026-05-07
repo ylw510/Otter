@@ -1,0 +1,42 @@
+# Node / frontend
+node_modules/
+dist/
+coverage/
+*.log
+npm-debug.log*
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+server/.env
+
+# Databases (local dev)
+*.db
+*.sqlite
+*.sqlite3
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Extension build output
+extension/dist/
+extension/.vite/
+
+# Misc
+*.egg-info/
+htmlcov/

@@ -16,7 +16,7 @@ let hoverTimer: ReturnType<typeof setTimeout> | null = null
 let lastEvent: MouseEvent | null = null
 let hoverTranslateEnabled = true
 
-function isCopilotUi(e: MouseEvent): boolean {
+function isOtterUi(e: MouseEvent): boolean {
   return e.composedPath().some(
     (n) =>
       n instanceof HTMLElement &&
@@ -105,7 +105,7 @@ async function runHoverExplain(e: MouseEvent) {
     hideTooltip()
     return
   }
-  if (isCopilotUi(e)) {
+  if (isOtterUi(e)) {
     hideTooltip()
     return
   }

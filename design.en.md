@@ -1,4 +1,4 @@
-# AI English Copilot — Design (English)
+# Otter — Design (English)
 
 English | [中文版](design.md)
 

@@ -23,4 +23,8 @@
 
 等价 npm：`npm run install:extension`、`npm run build:extension`、`npm run pack:extension`。
 
+## 图标
+
+矢量源 `icons/otter-mascot.svg`，PNG 由 `npm run icons` 生成。说明见仓库根目录 **`docs/design-icons.md`**。
+
 高级：需输出到固定挂载目录（如 VMware 共享盘）时，可在 **`extension/`** 内设置环境变量执行 `npm run build:shared` / `pack:shared`，见 `scripts/shared-artifacts.mjs`。

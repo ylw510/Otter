@@ -40,15 +40,18 @@ export function WordList() {
 
   if (loading) {
     return (
-      <div className="px-4 py-8 text-center text-sm text-zinc-500">加载中…</div>
+      <div className="px-4 py-8 text-center text-sm text-otter-muted">
+        加载中…
+      </div>
     )
   }
 
   if (words.length === 0) {
     return (
-      <div className="px-4 py-10 text-center text-sm text-zinc-500">
+      <div className="px-4 py-10 text-center text-sm text-otter-muted">
         在网页上选中单词，点击{' '}
-        <span className="text-zinc-300">💾 Save</span> 即可加入列表。
+        <span className="font-medium text-otter-accent">💾 Save</span>{' '}
+        即可加入列表。
       </div>
     )
   }

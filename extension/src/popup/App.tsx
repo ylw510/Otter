@@ -6,6 +6,9 @@ import { WordList } from './pages/WordList'
 
 type Page = 'list' | 'review' | 'settings' | 'test'
 
+const navBtn =
+  'rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-otter-ring focus-visible:ring-offset-2 focus-visible:ring-offset-otter-canvas'
+
 export function App() {
   const [page, setPage] = useState<Page>('list')
 
@@ -28,45 +31,41 @@ export function App() {
           : '调试'
 
   return (
-    <div className="min-h-[280px] bg-zinc-950 text-zinc-100">
-      <header className="border-b border-zinc-800 px-4 py-3">
+    <div className="min-h-[280px] bg-otter-canvas text-otter-ink">
+      <header className="border-b border-otter-border bg-otter-surface/80 px-4 py-3 shadow-otter-sm backdrop-blur-sm">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h1 className="text-sm font-semibold tracking-tight text-white">
+            <h1 className="font-display text-lg font-semibold tracking-tight text-otter-ink">
               Otter
             </h1>
-            <p className="mt-0.5 text-xs text-zinc-500">{subtitle}</p>
+            <p className="mt-0.5 text-xs text-otter-muted">{subtitle}</p>
           </div>
         </div>
-        <nav className="mt-3 flex gap-1 text-xs">
-          <button
-            type="button"
-            className={`rounded-md px-2.5 py-1 ${page === 'list' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
-            onClick={() => setPage('list')}
-          >
-            词汇
-          </button>
-          <button
-            type="button"
-            className={`rounded-md px-2.5 py-1 ${page === 'review' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
-            onClick={() => setPage('review')}
-          >
-            复习
-          </button>
-          <button
-            type="button"
-            className={`rounded-md px-2.5 py-1 ${page === 'settings' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
-            onClick={() => setPage('settings')}
-          >
-            设置
-          </button>
-          <button
-            type="button"
-            className={`rounded-md px-2.5 py-1 ${page === 'test' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
-            onClick={() => setPage('test')}
-          >
-            测试
-          </button>
+        <nav
+          className="mt-3 flex flex-wrap gap-1"
+          aria-label="主导航"
+        >
+          {(
+            [
+              ['list', '词汇'],
+              ['review', '复习'],
+              ['settings', '设置'],
+              ['test', '测试'],
+            ] as const
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              className={`${navBtn} ${
+                page === id
+                  ? 'bg-otter-surface-raised text-otter-ink shadow-otter-sm ring-1 ring-otter-border'
+                  : 'text-otter-muted hover:bg-otter-surface-raised hover:text-otter-ink'
+              }`}
+              onClick={() => setPage(id)}
+            >
+              {label}
+            </button>
+          ))}
         </nav>
       </header>
       {page === 'list' ? (

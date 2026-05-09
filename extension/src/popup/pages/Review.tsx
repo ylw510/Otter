@@ -11,6 +11,12 @@ const QUALITY_LABELS: Record<number, string> = {
   5: '很轻松',
 }
 
+const btnPrimary =
+  'rounded-lg bg-otter-accent px-3 py-2 text-sm font-medium text-white shadow-otter-sm transition-colors hover:bg-otter-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-otter-ring focus-visible:ring-offset-2 focus-visible:ring-offset-otter-canvas'
+
+const btnGhost =
+  'rounded-lg border border-otter-border bg-otter-surface-raised px-2 py-2 text-left text-xs text-otter-ink transition-colors hover:border-otter-border-strong hover:bg-otter-surface disabled:opacity-50'
+
 export function Review() {
   const [loading, setLoading] = useState(true)
   const [item, setItem] = useState<ReviewItem | null>(null)
@@ -73,7 +79,7 @@ export function Review() {
 
   if (loading) {
     return (
-      <div className="px-4 py-10 text-center text-sm text-zinc-500">
+      <div className="px-4 py-10 text-center text-sm text-otter-muted">
         加载复习…
       </div>
     )
@@ -82,12 +88,10 @@ export function Review() {
   if (err) {
     return (
       <div className="flex flex-col gap-3 px-4 py-6">
-        <p className="text-sm text-red-400">{err}</p>
-        <button
-          type="button"
-          className="rounded-md bg-zinc-800 px-3 py-2 text-sm text-white hover:bg-zinc-700"
-          onClick={() => void loadNext()}
-        >
+        <p className="rounded-lg border border-red-200 bg-otter-danger-bg px-3 py-2 text-sm text-otter-danger">
+          {err}
+        </p>
+        <button type="button" className={btnPrimary} onClick={() => void loadNext()}>
           重试
         </button>
       </div>
@@ -97,13 +101,13 @@ export function Review() {
   if (item === null) {
     return (
       <div className="px-4 py-10 text-center">
-        <p className="text-sm text-zinc-400">目前没有到期的复习项。</p>
-        <p className="mt-2 text-xs text-zinc-600">
+        <p className="text-sm text-otter-muted">目前没有到期的复习项。</p>
+        <p className="mt-2 text-xs text-otter-subtle">
           保存新词或等待下次复习时间。
         </p>
         <button
           type="button"
-          className="mt-4 rounded-md bg-indigo-600 px-3 py-2 text-sm text-white hover:bg-indigo-500"
+          className={`mt-4 ${btnPrimary}`}
           onClick={() => void loadNext()}
         >
           刷新
@@ -114,23 +118,23 @@ export function Review() {
 
   return (
     <div className="flex flex-col gap-4 px-4 py-4">
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/90 p-4 shadow-lg">
-        <div className="text-lg font-semibold leading-snug text-white">
+      <div className="rounded-xl border border-otter-border bg-otter-surface p-4 shadow-otter-card">
+        <div className="text-lg font-semibold leading-snug text-otter-ink">
           {item.word}
         </div>
         {item.sentence ? (
-          <p className="mt-3 text-sm leading-relaxed text-zinc-400">
+          <p className="mt-3 text-sm leading-relaxed text-otter-muted">
             {item.sentence}
           </p>
         ) : null}
         {item.explanation ? (
-          <p className="mt-3 border-t border-zinc-800 pt-3 text-sm text-zinc-500">
+          <p className="mt-3 border-t border-otter-border pt-3 text-sm text-otter-subtle">
             {item.explanation}
           </p>
         ) : null}
       </div>
       <div>
-        <p className="mb-2 text-xs font-medium text-zinc-500">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-otter-subtle">
           记忆程度（0–5）
         </p>
         <div className="grid grid-cols-2 gap-2">
@@ -139,10 +143,12 @@ export function Review() {
               key={q}
               type="button"
               disabled={busy}
-              className="rounded-lg border border-zinc-700 bg-zinc-950 px-2 py-2 text-left text-xs text-zinc-200 transition hover:border-indigo-500 hover:bg-zinc-900 disabled:opacity-50"
+              className={`${btnGhost} focus:outline-none focus-visible:ring-2 focus-visible:ring-otter-ring`}
               onClick={() => void submit(q)}
             >
-              <span className="font-mono text-indigo-400">{q}</span>{' '}
+              <span className="font-mono font-semibold text-otter-accent">
+                {q}
+              </span>{' '}
               {QUALITY_LABELS[q]}
             </button>
           ))}

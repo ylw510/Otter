@@ -1,13 +1,37 @@
 @import 'tailwindcss';
 
+/* Popup UI tokens — light-first, editorial warmth + teal accent (Issue #10) */
+@theme {
+  --font-display: 'Fraunces', ui-serif, Georgia, 'Songti SC', serif;
+  --font-sans:
+    'DM Sans', ui-sans-serif, system-ui, 'PingFang SC', 'Microsoft YaHei',
+    sans-serif;
+
+  --color-otter-canvas: #f3f0e8;
+  --color-otter-surface: #ffffff;
+  --color-otter-surface-raised: #faf8f4;
+  --color-otter-border: #e5dfd3;
+  --color-otter-border-strong: #d1c9bb;
+  --color-otter-ink: #1c1917;
+  --color-otter-muted: #57534e;
+  --color-otter-subtle: #78716c;
+  --color-otter-accent: #0f766e;
+  --color-otter-accent-hover: #0d9488;
+  --color-otter-ring: #14b8a6;
+  --color-otter-danger: #b91c1c;
+  --color-otter-danger-bg: #fef2f2;
+  --shadow-otter-sm: 0 1px 2px rgb(28 25 23 / 0.05);
+  --shadow-otter-card:
+    0 1px 2px rgb(28 25 23 / 0.04), 0 4px 14px rgb(28 25 23 / 0.06);
+}
+
 body {
   margin: 0;
   min-width: 320px;
   min-height: 200px;
-  font-family:
-    system-ui,
-    -apple-system,
-    Segoe UI,
-    Roboto,
-    sans-serif;
+  font-family: var(--font-sans);
+  font-optical-sizing: auto;
+  background-color: var(--color-otter-canvas);
+  color: var(--color-otter-ink);
+  -webkit-font-smoothing: antialiased;
 }

@@ -11,6 +11,8 @@ export const STORAGE_KEYS = {
   backendMode: `${APP_SLUG}_backendMode`,
   apiBaseUrl: `${APP_SLUG}_apiBaseUrl`,
   localApiKey: `${APP_SLUG}_localApiKey`,
+  /** Hover-to-explain/translate; default true when unset. */
+  hoverTranslateEnabled: `${APP_SLUG}_hoverTranslateEnabled`,
 } as const
 
 /** Legacy key used before AppConfig; still written for compatibility. */

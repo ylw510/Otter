@@ -2,6 +2,11 @@
 import { createRoot, type Root } from 'react-dom/client'
 import type { ExplainRequest, Message } from '../types'
 import { DOM_ID_PREFIX, prefixedDomId } from '../brand'
+import {
+  loadAppConfig,
+  normalizeHoverTranslateEnabled,
+} from '../config/appConfig'
+import { STORAGE_KEYS } from '../constants'
 
 const HOVER_DELAY_MS = 800
 
@@ -9,6 +14,7 @@ let hoverHost: HTMLDivElement | null = null
 let hoverRoot: Root | null = null
 let hoverTimer: ReturnType<typeof setTimeout> | null = null
 let lastEvent: MouseEvent | null = null
+let hoverTranslateEnabled = true
 
 function isCopilotUi(e: MouseEvent): boolean {
   return e.composedPath().some(
@@ -95,6 +101,10 @@ function TooltipView({ left, top, body, loading }: TipProps) {
 }
 
 async function runHoverExplain(e: MouseEvent) {
+  if (!hoverTranslateEnabled) {
+    hideTooltip()
+    return
+  }
   if (isCopilotUi(e)) {
     hideTooltip()
     return
@@ -153,10 +163,26 @@ async function runHoverExplain(e: MouseEvent) {
 export function initHoverExplain() {
   ensureHoverMount()
 
+  void loadAppConfig().then((c) => {
+    hoverTranslateEnabled = c.hoverTranslateEnabled
+  })
+
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'local') return
+    const ch = changes[STORAGE_KEYS.hoverTranslateEnabled]
+    if (!ch) return
+    hoverTranslateEnabled = normalizeHoverTranslateEnabled(ch.newValue)
+    if (!hoverTranslateEnabled) {
+      if (hoverTimer) clearTimeout(hoverTimer)
+      hideTooltip()
+    }
+  })
+
   const onMove = (e: MouseEvent) => {
     lastEvent = e
     if (hoverTimer) clearTimeout(hoverTimer)
     hideTooltip()
+    if (!hoverTranslateEnabled) return
     hoverTimer = window.setTimeout(() => {
       if (lastEvent) void runHoverExplain(lastEvent)
     }, HOVER_DELAY_MS)

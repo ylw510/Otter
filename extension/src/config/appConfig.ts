@@ -14,6 +14,13 @@ export type AppConfig = {
   apiBaseUrl: string
   /** Optional gate key sent only from Local mode builds (see Settings UI). */
   localApiKey?: string
+  /** Mouse hover triggers explain/translate tooltip; default true. */
+  hoverTranslateEnabled: boolean
+}
+
+/** Treat missing storage as enabled (default-on). */
+export function normalizeHoverTranslateEnabled(v: unknown): boolean {
+  return v !== false
 }
 
 export async function loadAppConfig(): Promise<AppConfig> {
@@ -21,6 +28,7 @@ export async function loadAppConfig(): Promise<AppConfig> {
     STORAGE_KEYS.backendMode,
     STORAGE_KEYS.apiBaseUrl,
     STORAGE_KEYS.localApiKey,
+    STORAGE_KEYS.hoverTranslateEnabled,
     LEGACY_SERVER_URL_KEY,
   ])
 
@@ -40,7 +48,11 @@ export async function loadAppConfig(): Promise<AppConfig> {
 
   const localApiKey = str(r[STORAGE_KEYS.localApiKey])
 
-  return { backendMode, apiBaseUrl, localApiKey }
+  const hoverTranslateEnabled = normalizeHoverTranslateEnabled(
+    r[STORAGE_KEYS.hoverTranslateEnabled],
+  )
+
+  return { backendMode, apiBaseUrl, localApiKey, hoverTranslateEnabled }
 }
 
 export async function saveAppConfig(cfg: AppConfig): Promise<void> {
@@ -54,6 +66,7 @@ export async function saveAppConfig(cfg: AppConfig): Promise<void> {
     [STORAGE_KEYS.backendMode]: cfg.backendMode,
     [STORAGE_KEYS.apiBaseUrl]: cfg.apiBaseUrl.trim() || DEFAULT_LOCAL_API_BASE,
     [STORAGE_KEYS.localApiKey]: keyToStore,
+    [STORAGE_KEYS.hoverTranslateEnabled]: cfg.hoverTranslateEnabled,
     [LEGACY_SERVER_URL_KEY]: cfg.apiBaseUrl.trim() || DEFAULT_LOCAL_API_BASE,
   })
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Same mascot as icons/otter-mascot.svg (popup dev favicon). -->
+<!-- Otter mascot icon source. Original artwork for this project; anime-inspired, small-size friendly. -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Otter mascot">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -21,17 +21,22 @@
     </radialGradient>
   </defs>
 
+  <!-- Rounded square plate (reads clearly at 16px) -->
   <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#bg)"/>
 
+  <!-- Ears -->
   <ellipse cx="38" cy="36" rx="18" ry="22" fill="url(#fur)" stroke="#8b5a3c" stroke-width="2.5" transform="rotate(-18 38 36)"/>
   <ellipse cx="90" cy="36" rx="18" ry="22" fill="url(#fur)" stroke="#8b5a3c" stroke-width="2.5" transform="rotate(18 90 36)"/>
   <ellipse cx="38" cy="38" rx="8" ry="10" fill="url(#earIn)" opacity="0.95" transform="rotate(-18 38 38)"/>
   <ellipse cx="90" cy="38" rx="8" ry="10" fill="url(#earIn)" opacity="0.95" transform="rotate(18 90 38)"/>
 
+  <!-- Head -->
   <ellipse cx="64" cy="68" rx="46" ry="40" fill="url(#fur)" stroke="#8b5a3c" stroke-width="2.5"/>
 
+  <!-- Cream muzzle -->
   <ellipse cx="64" cy="78" rx="28" ry="22" fill="#fdf3ea" stroke="#d4a574" stroke-width="1.8"/>
 
+  <!-- Anime eyes -->
   <ellipse cx="48" cy="62" rx="14" ry="18" fill="#1e1b4b"/>
   <ellipse cx="80" cy="62" rx="14" ry="18" fill="#1e1b4b"/>
   <ellipse cx="51" cy="56" rx="5" ry="7" fill="#ffffff"/>
@@ -39,17 +44,22 @@
   <ellipse cx="46" cy="66" rx="3" ry="4" fill="#a5b4fc" opacity="0.9"/>
   <ellipse cx="78" cy="66" rx="3" ry="4" fill="#a5b4fc" opacity="0.9"/>
 
+  <!-- Small shine -->
   <circle cx="53" cy="54" r="3" fill="#ffffff"/>
   <circle cx="85" cy="54" r="3" fill="#ffffff"/>
 
+  <!-- Nose -->
   <ellipse cx="64" cy="76" rx="7" ry="5" fill="#5c4033"/>
 
+  <!-- Mouth -->
   <path d="M64 82 Q54 88 46 86" fill="none" stroke="#8b5a3c" stroke-width="2.2" stroke-linecap="round"/>
   <path d="M64 82 Q74 88 82 86" fill="none" stroke="#8b5a3c" stroke-width="2.2" stroke-linecap="round"/>
 
+  <!-- Blush -->
   <ellipse cx="38" cy="72" rx="10" ry="6" fill="url(#cheek)" opacity="0.65"/>
   <ellipse cx="90" cy="72" rx="10" ry="6" fill="url(#cheek)" opacity="0.65"/>
 
+  <!-- Whiskers (subtle; mostly visible at 48+) -->
   <g stroke="#8b5a3c" stroke-width="1.5" stroke-linecap="round" opacity="0.55">
     <path d="M22 68 L34 70"/>
     <path d="M20 76 L32 76"/>

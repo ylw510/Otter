@@ -1,5 +1,5 @@
 import { getActiveAdapter } from '../adapters'
-import { prefixedDomId } from '../brand'
+import { APP_NAME, prefixedDomId } from '../brand'
 import { getInputText } from '../utils/dom'
 import { openRewritePanel } from './rewritePanel'
 
@@ -53,7 +53,7 @@ function attachButton(input: HTMLElement) {
   const btn = document.createElement('button')
   btn.type = 'button'
   btn.textContent = '✨'
-  btn.title = 'AI Rewrite (Copilot)'
+  btn.title = `AI Rewrite (${APP_NAME})`
   btn.style.width = '32px'
   btn.style.height = '28px'
   btn.style.background = '#6366f1'

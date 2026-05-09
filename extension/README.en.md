@@ -23,4 +23,8 @@ From the **repository root**, use **`./otter-extension.sh`** (defaults: unpacked
 
 Equivalent npm: `npm run install:extension`, `npm run build:extension`, `npm run pack:extension`.
 
+## Icons
+
+Vector source `icons/otter-mascot.svg`; run `npm run icons` to regenerate PNGs. See **`docs/design-icons.md`** at the repo root.
+
 Advanced (VMware/shared path): run `npm run build:shared` / `pack:shared` inside **`extension/`** with env vars — see `scripts/shared-artifacts.mjs`.

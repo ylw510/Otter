@@ -2,7 +2,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createRoot, type Root } from 'react-dom/client'
 import { useEffect, useState, type CSSProperties } from 'react'
-import { APP_NAME, prefixedDomId } from '../brand'
+import { APP_NAME, LOG_PREFIX, prefixedDomId } from '../brand'
 import type { ExplainRequest, Message } from '../types'
 import { getContextSentence, siteLabel } from '../utils/dom'
 import { saveWord } from '../utils/storage'
@@ -67,14 +67,14 @@ function FloatingMenu({ text, top, left, onDone }: MenuProps) {
       source_site: siteLabel(),
       source_title: document.title || undefined,
     }
-    console.info('[AI English Copilot][Save] click → saveWord()', {
+    console.info(`${LOG_PREFIX}[Save] click → saveWord()`, {
       word: payload.word,
       source_site: payload.source_site,
       source_url: payload.source_url.slice(0, 120),
     })
     try {
       const result = await saveWord(payload)
-      console.info('[AI English Copilot][Save] saveWord() resolved', {
+      console.info(`${LOG_PREFIX}[Save] saveWord() resolved`, {
         id: result.id,
         word: result.word,
       })
@@ -84,7 +84,7 @@ function FloatingMenu({ text, top, left, onDone }: MenuProps) {
         onDone()
       }, 650)
     } catch (e) {
-      console.error('[AI English Copilot][Save] saveWord() rejected', e)
+      console.error(`${LOG_PREFIX}[Save] saveWord() rejected`, e)
       const tip =
         e instanceof Error && e.message
           ? `❌ ${e.message}`
@@ -168,7 +168,7 @@ function FloatingMenu({ text, top, left, onDone }: MenuProps) {
           }}
           onClick={() => {
             void handleSave().catch((err) => {
-              console.error('[AI English Copilot][Save] unhandled rejection', err)
+              console.error(`${LOG_PREFIX}[Save] unhandled rejection`, err)
             })
           }}
         >
@@ -259,7 +259,7 @@ export function initSelectionMenu() {
         return
       }
 
-      console.log('[AI English Copilot] selected:', selected)
+      console.log(`${LOG_PREFIX} selected:`, selected)
 
       let rect: DOMRect | null = null
       if (selection && selection.rangeCount > 0) {
@@ -269,7 +269,7 @@ export function initSelectionMenu() {
         lastSelectionSnapshot.text === selected
       ) {
         console.info(
-          '[AI English Copilot] rangeCount=0 but text matches cache (e.g. X.com cleared range); using cached rect',
+          `${LOG_PREFIX} rangeCount=0 but text matches cache (e.g. X.com cleared range); using cached rect`,
         )
         rect = lastSelectionSnapshot.rect
       }
@@ -277,7 +277,7 @@ export function initSelectionMenu() {
       if (!rect || (rect.width === 0 && rect.height === 0)) {
         const fallback = new DOMRect(e.clientX, e.clientY, 0, 0)
         console.warn(
-          '[AI English Copilot] no usable rect; anchoring menu to pointer',
+          `${LOG_PREFIX} no usable rect; anchoring menu to pointer`,
           { rangeCount: selection?.rangeCount, selected },
         )
         rect = fallback

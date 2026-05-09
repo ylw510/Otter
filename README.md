@@ -31,7 +31,7 @@ Otter 是一个浏览器内的 AI 英语副驾，让阅读与写作形成闭环�
    - **推荐**：`./otter-extension.sh`（见 `./otter-extension.sh help`）
    - 首次：`./otter-extension.sh install`，再 `./otter-extension.sh build`
    - **默认产物**：未打包扩展 → **`build/extension/`**；zip → **`build/releases/otter-extension.zip`**
-   - 自定义目录：`./otter-extension.sh build -o /路径/扩展目录`、`./otter-extension.sh pack -o ~/Downloads`（目录则自动生成 zip 文件名）、或 `pack -o ./out/foo.zip`
+   - 自定义产物输出目录：`./otter-extension.sh build -o /路径/扩展目录`、`./otter-extension.sh pack -o ~/Downloads`（目录则自动生成 zip 文件名）、或 `pack -o ./out/foo.zip`
    - 打包前指定构建输出：`./otter-extension.sh pack --dist ./out/ext -o ./out/foo.zip`
    - 等价：`npm run install:extension`、`npm run build:extension`、`npm run pack:extension`（根目录 `package.json`，行为与脚本一致）
    - 若在 **`extension/`** 内直接 `npm run build`，产物仍为 **`extension/dist/`**（供本地开发）

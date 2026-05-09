@@ -36,4 +36,3 @@ Otter 是一个浏览器内的 AI 英语副驾，让阅读与写作形成闭环�
 
 - 架构：`docs/architecture.en.md` / `docs/architecture.zh.md`
 - 隐私：`docs/privacy.en.md` / `docs/privacy.zh.md`
-- 安全：`SECURITY.en.md` / `SECURITY.zh.md`

@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "AI English Copilot",
+  "name": "Otter",
   "version": "0.1.0",
   "description": "Browser-native English learning & writing assistant",
   "permissions": ["activeTab", "storage", "scripting"],

@@ -33,6 +33,7 @@ Otter 是一个浏览器内的 AI 英语副驾，让阅读与写作形成闭环�
    - **默认产物**：未打包扩展 → **`build/extension/`**；zip → **`build/releases/otter-extension.zip`**
    - 自定义产物输出目录：`./otter-extension.sh build -o /路径/扩展目录`、`./otter-extension.sh pack -o ~/Downloads`（目录则自动生成 zip 文件名）、或 `pack -o ./out/foo.zip`
    - 打包前指定构建输出：`./otter-extension.sh pack --dist ./out/ext -o ./out/foo.zip`
+   - 只要未打包目录、不要 zip（例如输出到 VMware 共享盘）：`./otter-extension.sh pack -o /mnt/hgfs/Share --no-zip` → 扩展目录为 **`/mnt/hgfs/Share/otter-extension/`**（也可用 `--dist` 指定完整路径）
    - 等价：`npm run install:extension`、`npm run build:extension`、`npm run pack:extension`（根目录 `package.json`，行为与脚本一致）
    - 若在 **`extension/`** 内直接 `npm run build`，产物仍为 **`extension/dist/`**（供本地开发）
 3. 在 `chrome://extensions` 开启开发者模式并加载 **`build/extension/`**（若使用上述根目录命令）；若在 `extension/` 内构建则加载 **`extension/dist`**

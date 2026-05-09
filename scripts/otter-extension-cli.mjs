@@ -10,7 +10,6 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
-const EXT = path.join(ROOT, 'extension')
 
 const DEFAULT_UNPACKED = path.join(ROOT, 'build', 'extension')
 const DEFAULT_ZIP = path.join(
@@ -26,7 +25,7 @@ function usage() {
 命令:
   install       安装扩展依赖（extension 内 npm ci）
   build         构建未打包扩展目录
-  pack          构建并打 zip
+  pack          构建并打 zip（可加 --no-zip 只输出未打包目录，不打 zip）
   lint          ESLint
   test          Vitest
 
@@ -34,12 +33,14 @@ function usage() {
   build  [-o|--out <DIR>]     输出目录（默认: build/extension）
   pack   [-o|--out <路径>]    zip 文件路径，或目录（在目录内生成 otter-extension.zip）
          [--dist <DIR>]       构建阶段输出目录（默认与 build 相同: build/extension）
+         [--no-zip]           只构建未打包扩展，不打 zip；-o 为父目录时在子目录 otter-extension 下输出
 
 示例:
   ./otter-extension.sh install && ./otter-extension.sh build
   ./otter-extension.sh build -o ./out/ext
   ./otter-extension.sh pack -o ~/Downloads
   ./otter-extension.sh pack -o ./dist/foo.zip --dist ./out/ext
+  ./otter-extension.sh pack -o /mnt/hgfs/Share --no-zip
 `)
 }
 
@@ -85,6 +86,15 @@ function resolveZipPath(flag) {
   return path.join(p, 'otter-extension.zip')
 }
 
+/** pack --no-zip：-o 为父目录时输出到 <父>/otter-extension；已是 .../otter-extension 则直接用 */
+function resolveUnpackOnlyDest(outFlag) {
+  const p = resolveUserPath(outFlag)
+  if (!p) throw new Error('缺少 -o')
+  const base = path.basename(p)
+  if (base === 'otter-extension') return p
+  return path.join(p, 'otter-extension')
+}
+
 function parseBuildArgs(argv) {
   let out = null
   for (let i = 0; i < argv.length; i++) {
@@ -102,6 +112,7 @@ function parseBuildArgs(argv) {
 function parsePackArgs(argv) {
   let out = null
   let dist = null
+  let noZip = false
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
     if (a === '-o' || a === '--out') {
@@ -110,11 +121,13 @@ function parsePackArgs(argv) {
     } else if (a === '--dist') {
       dist = argv[++i]
       if (dist === undefined) throw new Error('缺少 --dist 路径')
+    } else if (a === '--no-zip') {
+      noZip = true
     } else {
       throw new Error(`未知参数: ${a}`)
     }
   }
-  return { out, dist }
+  return { out, dist, noZip }
 }
 
 function cmdBuild(argv) {
@@ -127,7 +140,23 @@ function cmdBuild(argv) {
 }
 
 function cmdPack(argv) {
-  const { out, dist } = parsePackArgs(argv)
+  const { out, dist, noZip } = parsePackArgs(argv)
+  if (noZip) {
+    let unpacked
+    if (dist) {
+      unpacked = resolveUnpackedDir(dist)
+    } else if (out) {
+      unpacked = resolveUnpackOnlyDest(out)
+    } else {
+      throw new Error('pack --no-zip 需要 -o <目录> 或 --dist <目录>')
+    }
+    fs.mkdirSync(unpacked, { recursive: true })
+    spawnNpm(['--prefix', 'extension', 'run', 'build'], {
+      EXTENSION_OUT_DIR: unpacked,
+    })
+    return
+  }
+
   const unpacked = resolveUnpackedDir(dist)
   const zipFile = resolveZipPath(out)
   fs.mkdirSync(unpacked, { recursive: true })

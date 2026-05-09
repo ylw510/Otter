@@ -33,6 +33,7 @@ Most English tools are isolated apps. Otter is browser-native: the Chrome extens
    - **Defaults**: unpacked extension → **`build/extension/`**; zip → **`build/releases/otter-extension.zip`**
    - Custom output: `./otter-extension.sh build -o /path/to/unpacked`, `./otter-extension.sh pack -o ~/Downloads` (directory → zip name inside), or `pack -o ./out/foo.zip`
    - Pin build dir for pack: `./otter-extension.sh pack --dist ./out/ext -o ./out/foo.zip`
+   - Unpacked only, no zip (e.g. VMware share): `./otter-extension.sh pack -o /mnt/hgfs/Share --no-zip` → **`/mnt/hgfs/Share/otter-extension/`** (or use `--dist` for an explicit path)
    - Equivalent: `npm run install:extension`, `npm run build:extension`, `npm run pack:extension` (root `package.json`)
    - If you run `npm run build` **inside `extension/`**, output stays **`extension/dist/`** (local dev workflow)
 3. Load **`build/extension/`** in `chrome://extensions` when using the root scripts; load **`extension/dist`** if you built inside `extension/`.

@@ -33,7 +33,7 @@ export function App() {
         <div className="flex items-start justify-between gap-2">
           <div>
             <h1 className="text-sm font-semibold tracking-tight text-white">
-              AI English Copilot
+              Otter
             </h1>
             <p className="mt-0.5 text-xs text-zinc-500">{subtitle}</p>
           </div>

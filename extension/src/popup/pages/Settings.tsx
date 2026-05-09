@@ -9,6 +9,7 @@ export function Settings({ onBack }: Props) {
   const [mode, setMode] = useState<BackendMode>('local')
   const [url, setUrl] = useState(DEFAULT_LOCAL_API_BASE)
   const [localApiKey, setLocalApiKey] = useState('')
+  const [hoverTranslateEnabled, setHoverTranslateEnabled] = useState(true)
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
@@ -16,6 +17,7 @@ export function Settings({ onBack }: Props) {
       setMode(c.backendMode)
       setUrl(c.apiBaseUrl || DEFAULT_LOCAL_API_BASE)
       setLocalApiKey(c.localApiKey ?? '')
+      setHoverTranslateEnabled(c.hoverTranslateEnabled)
     })
   }, [])
 
@@ -24,6 +26,7 @@ export function Settings({ onBack }: Props) {
       backendMode: mode,
       apiBaseUrl: url.trim() || DEFAULT_LOCAL_API_BASE,
       localApiKey: mode === 'local' ? localApiKey : undefined,
+      hoverTranslateEnabled,
     }).then(() => {
       setSaved(true)
       window.setTimeout(() => setSaved(false), 1800)
@@ -106,6 +109,26 @@ export function Settings({ onBack }: Props) {
           </p>
         </div>
       ) : null}
+
+      <div>
+        <label className="mb-1 block text-xs font-medium text-zinc-400">
+          悬浮翻译
+        </label>
+        <label className="flex cursor-pointer items-center gap-2 rounded-md border border-zinc-700 bg-zinc-900/60 px-3 py-2">
+          <input
+            type="checkbox"
+            className="h-4 w-4 rounded border-zinc-600 text-indigo-500 focus:ring-indigo-500"
+            checked={hoverTranslateEnabled}
+            onChange={(e) => setHoverTranslateEnabled(e.target.checked)}
+          />
+          <span className="text-sm text-zinc-200">
+            鼠标悬停时显示词汇解释
+          </span>
+        </label>
+        <p className="mt-1 text-[11px] text-zinc-500">
+          默认开启；关闭后仅禁用悬浮触发，划词菜单等功能不受影响。
+        </p>
+      </div>
 
       <button
         type="button"

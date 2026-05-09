@@ -57,6 +57,12 @@ export function Test() {
             {cfg.localApiKey ? '（已设置）' : '（未设置）'}
           </dd>
         </div>
+        <div className="flex justify-between gap-2">
+          <dt className="text-zinc-500">hoverTranslateEnabled</dt>
+          <dd className="text-right text-zinc-200">
+            {cfg.hoverTranslateEnabled ? 'true' : 'false'}
+          </dd>
+        </div>
       </dl>
     </div>
   )

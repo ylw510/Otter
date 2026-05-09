@@ -37,6 +37,9 @@ server/.env
 extension/dist/
 extension/.vite/
 
+# Root CLI default outputs (see otter-extension.sh)
+/build/
+
 # Misc
 *.egg-info/
 htmlcov/

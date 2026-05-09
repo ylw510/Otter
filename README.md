@@ -26,10 +26,16 @@ Otter 是一个浏览器内的 AI 英语副驾，让阅读与写作形成闭环�
 1. 启动后端：
    - `cd server`
    - 创建虚拟环境、安装依赖、配置 `.env`
-   - 运行 `uvicorn main:app --reload --host 127.0.0.1 --port 8000`
-2. 构建扩展：
-   - `cd extension && npm install && npm run build`
-3. 在 `chrome://extensions` 开启开发者模式并加载 `extension/dist`
+   - `./run.sh`（默认 **`0.0.0.0:8000`**；启用 **`--reload`**：修改后端代码后 uvicorn 会自动重启进程，无需手动停启）。自定义：`./run.sh --host 127.0.0.1 --port 8000`，或环境变量 `OTTER_HOST` / `OTTER_PORT`。也可在仓库根目录执行 `./server/run.sh`。
+2. 构建扩展（**在仓库根目录**，无需先 `cd extension`）：
+   - **推荐**：`./otter-extension.sh`（见 `./otter-extension.sh help`）
+   - 首次：`./otter-extension.sh install`，再 `./otter-extension.sh build`
+   - **默认产物**：未打包扩展 → **`build/extension/`**；zip → **`build/releases/otter-extension.zip`**
+   - 自定义目录：`./otter-extension.sh build -o /路径/扩展目录`、`./otter-extension.sh pack -o ~/Downloads`（目录则自动生成 zip 文件名）、或 `pack -o ./out/foo.zip`
+   - 打包前指定构建输出：`./otter-extension.sh pack --dist ./out/ext -o ./out/foo.zip`
+   - 等价：`npm run install:extension`、`npm run build:extension`、`npm run pack:extension`（根目录 `package.json`，行为与脚本一致）
+   - 若在 **`extension/`** 内直接 `npm run build`，产物仍为 **`extension/dist/`**（供本地开发）
+3. 在 `chrome://extensions` 开启开发者模式并加载 **`build/extension/`**（若使用上述根目录命令）；若在 `extension/` 内构建则加载 **`extension/dist`**
 4. 在扩展设置中选择 Local 模式并配置 `http://localhost:8000`
 
 ## 更多文档

@@ -1,6 +1,6 @@
 /**
  * 将扩展构建产物输出到 VMware 共享盘（默认 /mnt/hgfs/Share）。
- * 宿主机 Windows 侧一般为「共享文件夹」下的 ai-english-copilot-dist。
+ * 宿主机 Windows 侧一般为「共享文件夹」下的 otter-extension。
  *
  * 覆盖共享根路径：EXTENSION_SHARED_ROOT=/your/path node scripts/shared-artifacts.mjs
  */
@@ -14,7 +14,7 @@ const extRoot = path.join(__dirname, '..')
 
 const sharedRoot =
   process.env.EXTENSION_SHARED_ROOT?.trim() || '/mnt/hgfs/Share'
-const outDir = path.join(sharedRoot, 'ai-english-copilot-dist')
+const outDir = path.join(sharedRoot, 'otter-extension')
 
 if (!fs.existsSync(sharedRoot)) {
   console.error(
@@ -40,7 +40,7 @@ console.log('\n[shared-artifacts] 构建完成 →', outDir)
 
 const wantZip = process.argv.includes('--zip')
 if (wantZip) {
-  const zipPath = path.join(sharedRoot, 'ai-english-copilot-dist.zip')
+  const zipPath = path.join(sharedRoot, 'otter-extension.zip')
   execSync(`cd "${outDir}" && zip -r "${zipPath}" .`, { stdio: 'inherit' })
   console.log('[shared-artifacts] zip →', zipPath)
 }

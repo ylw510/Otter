@@ -26,10 +26,16 @@ Most English tools are isolated apps. Otter is browser-native: the Chrome extens
 1. Start backend:
    - `cd server`
    - create venv, install requirements, configure `.env`
-   - run `uvicorn main:app --reload --host 127.0.0.1 --port 8000`
-2. Build extension:
-   - `cd extension && npm install && npm run build`
-3. Load `extension/dist` in `chrome://extensions` (Developer mode).
+   - `./run.sh` (defaults **`0.0.0.0:8000`**; **`--reload`** makes uvicorn restart when server code changes—no manual restart). Override: `./run.sh --host 127.0.0.1 --port 8000`, or env `OTTER_HOST` / `OTTER_PORT`. From repo root: `./server/run.sh`.
+2. Build extension (**from the repo root**):
+   - **Recommended**: `./otter-extension.sh` (see `./otter-extension.sh help`)
+   - First-time: `./otter-extension.sh install`, then `./otter-extension.sh build`
+   - **Defaults**: unpacked extension → **`build/extension/`**; zip → **`build/releases/otter-extension.zip`**
+   - Custom output: `./otter-extension.sh build -o /path/to/unpacked`, `./otter-extension.sh pack -o ~/Downloads` (directory → zip name inside), or `pack -o ./out/foo.zip`
+   - Pin build dir for pack: `./otter-extension.sh pack --dist ./out/ext -o ./out/foo.zip`
+   - Equivalent: `npm run install:extension`, `npm run build:extension`, `npm run pack:extension` (root `package.json`)
+   - If you run `npm run build` **inside `extension/`**, output stays **`extension/dist/`** (local dev workflow)
+3. Load **`build/extension/`** in `chrome://extensions` when using the root scripts; load **`extension/dist`** if you built inside `extension/`.
 4. In extension settings, set Local mode + `http://localhost:8000`.
 
 ## More docs

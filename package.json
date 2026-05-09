@@ -1,0 +1,13 @@
+{
+  "name": "otter",
+  "private": true,
+  "description": "Wrapper scripts for extension/server; see README.md",
+  "scripts": {
+    "install:extension": "node scripts/otter-extension-cli.mjs install",
+    "build:extension": "node scripts/otter-extension-cli.mjs build",
+    "build:dist": "npm run build:extension",
+    "pack:extension": "node scripts/otter-extension-cli.mjs pack",
+    "lint:extension": "node scripts/otter-extension-cli.mjs lint",
+    "test:extension": "node scripts/otter-extension-cli.mjs test"
+  }
+}

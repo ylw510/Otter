@@ -23,6 +23,25 @@ Otter 是一个浏览器内的 AI 英语副驾，让阅读与写作形成闭环�
 
 ## 快速开始
 
+### 前置安装
+
+| 平台 | 依赖 | 最低版本 | 备注 |
+|------|------|---------|------|
+| Linux / macOS | Python | 3.11+ | `python3 --version` |
+| Linux / macOS | Node.js | 20+ | `node --version` |
+| Windows | Python | 3.11+ | 需从 [python.org](https://www.python.org/downloads/) 安装，**不要用** Microsoft Store 版本；安装时勾选 "Add Python to PATH" |
+| Windows | Node.js | 20+ | 从 [nodejs.org](https://nodejs.org/) 安装 |
+
+验证安装：
+
+```bash
+python --version    # Linux/macOS 用 python3 --version
+node --version
+npm --version
+```
+
+> Windows 用户注意：Microsoft Store 提供的 Python 是存根（仅跳转到 Store），功能不完整。请从 python.org 下载官方安装包。
+
 ### Linux / macOS
 
 1. 启动后端：
@@ -42,12 +61,13 @@ Otter 是一个浏览器内的 AI 英语副驾，让阅读与写作形成闭环�
 
 ### Windows
 
-Otter 支持 Windows（Git Bash / PowerShell / WSL）下的构建。
+Otter 支持 Windows（Git Bash / PowerShell / WSL）下的构建。**开始前请确认上方「前置安装」中的依赖已就绪。**
 
-1. **后端**（PowerShell）：
+1. **后端**（PowerShell 或 Git Bash）：
    - `cd server`
    - 创建虚拟环境：`python -m venv .venv`
-   - 安装依赖：`.venv\Scripts\pip install -r requirements.txt`
+   - 安装依赖（PowerShell）：`.venv\Scripts\pip install -r requirements.txt`
+   - 安装依赖（Git Bash）：`.venv/Scripts/pip install -r requirements.txt` 或在 `server` 目录执行 `python -m pip install -r requirements.txt`
    - 启动：`run.bat`（默认 `0.0.0.0:8000`，支持 `--reload`），或手动 `.venv\Scripts\uvicorn main:app --host 0.0.0.0 --port 8000 --reload`
 
 2. **构建扩展**（PowerShell 或 Git Bash，**在仓库根目录**）：
@@ -64,6 +84,7 @@ Otter 支持 Windows（Git Bash / PowerShell / WSL）下的构建。
 
 ## 更多文档
 
+- 构建问题排查：`docs/build-troubleshooting.md` / `docs/build-troubleshooting.en.md`
 - 架构：`docs/architecture.en.md` / `docs/architecture.zh.md`
 - 隐私：`docs/privacy.en.md` / `docs/privacy.zh.md`
 - 扩展图标：`docs/design-icons.md`

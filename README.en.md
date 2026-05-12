@@ -41,6 +41,7 @@ Most English tools are isolated apps. Otter is browser-native: the Chrome extens
 
 ## More docs
 
+- Build troubleshooting: `docs/build-troubleshooting.en.md` / `docs/build-troubleshooting.md`
 - Architecture: `docs/architecture.en.md` / `docs/architecture.zh.md`
 - Privacy: `docs/privacy.en.md` / `docs/privacy.zh.md`
 - Extension icons: `docs/design-icons.md`

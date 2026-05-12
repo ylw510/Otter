@@ -23,6 +23,8 @@ Otter 是一个浏览器内的 AI 英语副驾，让阅读与写作形成闭环�
 
 ## 快速开始
 
+### Linux / macOS
+
 1. 启动后端：
    - `cd server`
    - 创建虚拟环境、安装依赖、配置 `.env`
@@ -34,10 +36,31 @@ Otter 是一个浏览器内的 AI 英语副驾，让阅读与写作形成闭环�
    - 自定义产物输出目录：`./otter-extension.sh build -o /路径/扩展目录`、`./otter-extension.sh pack -o ~/Downloads`（目录则自动生成 zip 文件名）、或 `pack -o ./out/foo.zip`
    - 打包前指定构建输出：`./otter-extension.sh pack --dist ./out/ext -o ./out/foo.zip`
    - 只要未打包目录、不要 zip（例如输出到 VMware 共享盘）：`./otter-extension.sh pack -o /mnt/hgfs/Share --no-zip` → 扩展目录为 **`/mnt/hgfs/Share/otter-extension/`**（也可用 `--dist` 指定完整路径）
-   - 等价：`npm run install:extension`、`npm run build:extension`、`npm run pack:extension`（根目录 `package.json`，行为与脚本一致）
    - 若在 **`extension/`** 内直接 `npm run build`，产物仍为 **`extension/dist/`**（供本地开发）
 3. 在 `chrome://extensions` 开启开发者模式并加载 **`build/extension/`**（若使用上述根目录命令）；若在 `extension/` 内构建则加载 **`extension/dist`**
 4. 在扩展设置中选择 Local 模式并配置 `http://localhost:8000`
+
+### Windows
+
+Otter 支持 Windows（Git Bash / PowerShell / WSL）下的构建。
+
+1. **后端**（PowerShell）：
+   - `cd server`
+   - 创建虚拟环境：`python -m venv .venv`
+   - 安装依赖：`.venv\Scripts\pip install -r requirements.txt`
+   - 启动：`run.bat`（默认 `0.0.0.0:8000`，支持 `--reload`），或手动 `.venv\Scripts\uvicorn main:app --host 0.0.0.0 --port 8000 --reload`
+
+2. **构建扩展**（PowerShell 或 Git Bash，**在仓库根目录**）：
+   - 首次安装依赖：`npm run install:extension`
+   - 构建：`npm run build:extension`
+   - 打包：`npm run pack:extension`
+   - 自定义输出：`npm run build:extension -- -o 输出目录`
+   - 若在 `extension/` 内直接 `npm run build`，产物为 **`extension/dist/`**
+
+3. 在 `chrome://extensions` 开启开发者模式并加载 **`build/extension/`**（若使用根目录命令）或 **`extension/dist`**
+4. 在扩展设置中选择 Local 模式并配置 `http://localhost:8000`
+
+> **注意**：Windows 下打包 zip 使用 .NET `System.IO.Compression`（无需额外安装工具）；`npm run` 命令与 Linux/macOS 行为一致。
 
 ## 更多文档
 

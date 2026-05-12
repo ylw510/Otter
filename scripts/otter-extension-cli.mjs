@@ -21,6 +21,7 @@ const DEFAULT_ZIP = path.join(
 
 function usage() {
   console.log(`用法: ./otter-extension.sh <command> [选项]
+  Windows 用户请使用: npm run <command>
 
 命令:
   install       安装扩展依赖（extension 内 npm ci）
@@ -36,9 +37,9 @@ function usage() {
          [--no-zip]           只构建未打包扩展，不打 zip；-o 为父目录时在子目录 otter-extension 下输出
 
 示例:
-  ./otter-extension.sh install && ./otter-extension.sh build
-  ./otter-extension.sh build -o ./out/ext
-  ./otter-extension.sh pack -o ~/Downloads
+  ./otter-extension.sh install && ./otter-extension.sh build     # Linux / macOS
+  npm run build:extension                                        # Windows / 跨平台
+  npm run pack:extension -- -o ~/Downloads                       # Windows / 跨平台
   ./otter-extension.sh pack -o ./dist/foo.zip --dist ./out/ext
   ./otter-extension.sh pack -o /mnt/hgfs/Share --no-zip
 `)
@@ -57,9 +58,8 @@ function spawnNpm(args, env = {}) {
 
 function resolveUserPath(p) {
   if (!p) return null
-  const expanded = p.startsWith('~')
-    ? path.join(process.env.HOME ?? '', p.slice(1))
-    : p
+  const home = process.env.HOME || process.env.USERPROFILE || ''
+  const expanded = p.startsWith('~') ? path.join(home, p.slice(1)) : p
   return path.isAbsolute(expanded)
     ? path.normalize(expanded)
     : path.resolve(ROOT, expanded)

@@ -1,4 +1,4 @@
-import { execSync } from 'node:child_process'
+import { execSync, spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -28,5 +28,20 @@ if (!fs.existsSync(outDir)) {
 
 fs.mkdirSync(path.dirname(zipPath), { recursive: true })
 
-execSync(`cd "${outDir}" && zip -r "${zipPath}" .`, { stdio: 'inherit' })
+function createZip(srcDir, dest) {
+  const absSrc = path.resolve(srcDir)
+  const absDest = path.resolve(dest)
+  if (process.platform === 'win32') {
+    const r = spawnSync('powershell', [
+      '-NoProfile',
+      '-Command',
+      `Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::CreateFromDirectory('${absSrc.replace(/'/g, "''")}', '${absDest.replace(/'/g, "''")}', 'Optimal', $false)`,
+    ], { stdio: 'inherit', shell: true })
+    if (r.status !== 0) process.exit(r.status ?? 1)
+  } else {
+    execSync(`cd "${absSrc}" && zip -r "${absDest}" .`, { stdio: 'inherit' })
+  }
+}
+
+createZip(outDir, zipPath)
 console.log('Wrote', zipPath)

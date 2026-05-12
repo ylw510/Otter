@@ -37,6 +37,9 @@ server/.env
 extension/dist/
 extension/.vite/
 
+# Local MCP server config (per-developer)
+.mcp.json
+
 # Root CLI default outputs (see otter-extension.sh)
 /build/
 

@@ -8,6 +8,8 @@ import type {
   RewriteResponse,
   ReviewAnswer,
   SaveWordRequest,
+  TranslateRequest,
+  TranslateResponse,
   Word,
 } from '../types'
 
@@ -23,6 +25,7 @@ export type FetchWithTimeout = (
 export interface BackendClient {
   rewrite(input: RewriteRequest): Promise<unknown>
   explain(input: ExplainRequest): Promise<unknown>
+  translate(input: TranslateRequest): Promise<unknown>
   saveWord(input: SaveWordRequest): Promise<unknown>
 }
 
@@ -106,6 +109,15 @@ class BaseHttpBackendClient implements HttpBackendClient {
       text: input.text,
       sentence: input.sentence ?? '',
     }) as Promise<ExplainResponse>
+  }
+
+  async translate(input: TranslateRequest): Promise<TranslateResponse> {
+    return this.post(`${API_PREFIX}/translate`, {
+      text: input.text,
+      sentence: input.sentence ?? '',
+      source_lang: input.source_lang ?? 'en',
+      target_lang: input.target_lang ?? 'zh',
+    }) as Promise<TranslateResponse>
   }
 
   async saveWord(input: SaveWordRequest): Promise<Word> {

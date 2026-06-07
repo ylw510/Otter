@@ -1,0 +1,36 @@
+.textLayer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  line-height: 1;
+  text-size-adjust: none;
+  forced-color-adjust: none;
+  transform-origin: 0 0;
+  z-index: 2;
+  user-select: text;
+}
+
+.textLayer span,
+.textLayer br {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0 0;
+}
+
+.textLayer ::selection {
+  background: rgba(0, 120, 215, 0.35);
+}
+
+.pdf-page-wrap {
+  position: relative;
+  margin: 0 auto 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  background: #fff;
+}
+
+.pdf-page-wrap canvas {
+  display: block;
+  vertical-align: top;
+}

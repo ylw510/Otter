@@ -30,3 +30,15 @@ async def test_ai_explain_strips():
     ):
         out = await ai_service.ai_explain("w", "")
         assert out == {"explanation": "hello"}
+
+
+@pytest.mark.asyncio
+async def test_ai_translate_strips():
+    with patch.object(
+        ai_service,
+        "chat_completion",
+        new_callable=AsyncMock,
+        return_value="  你好  ",
+    ):
+        out = await ai_service.ai_translate("hi", "")
+        assert out == {"translation": "你好"}

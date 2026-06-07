@@ -1,5 +1,15 @@
+import {
+  getPdfContextSentence,
+  isPdfViewerPage,
+  pdfSiteLabel,
+} from './pdfContext'
+
 /** 获取所选文字所在句子的近似上下文 */
 export function getContextSentence(selectedText: string): string {
+  if (isPdfViewerPage()) {
+    return getPdfContextSentence(selectedText)
+  }
+
   const selection = window.getSelection()
   if (!selection?.rangeCount) return ''
 
@@ -19,6 +29,10 @@ export function getContextSentence(selectedText: string): string {
 
 /** 用于展示的站点标签（X / GitHub / hostname） */
 export function siteLabel(): string {
+  if (isPdfViewerPage()) {
+    return pdfSiteLabel()
+  }
+
   const h = location.hostname.replace(/^www\./, '')
   if (h === 'x.com' || h === 'twitter.com') return 'X'
   if (h.includes('github')) return 'GitHub'

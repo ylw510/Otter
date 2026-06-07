@@ -13,6 +13,10 @@ export const STORAGE_KEYS = {
   localApiKey: `${APP_SLUG}_localApiKey`,
   /** Hover-to-explain/translate; default true when unset. */
   hoverTranslateEnabled: `${APP_SLUG}_hoverTranslateEnabled`,
+  /** Session-only: bytes for PDF opened from popup file picker. */
+  pendingPdfBytes: `${APP_SLUG}_pendingPdfBytes`,
+  pendingPdfName: `${APP_SLUG}_pendingPdfName`,
+  pendingPdfUrl: `${APP_SLUG}_pendingPdfUrl`,
 } as const
 
 /** Legacy key used before AppConfig; still written for compatibility. */

@@ -28,3 +28,24 @@ async def ai_explain(text: str, sentence: str = "") -> dict:
         response_format_json=False,
     )
     return {"explanation": (raw_text or "").strip()}
+
+
+async def ai_translate(
+    text: str,
+    sentence: str = "",
+    *,
+    source_lang: str = "en",
+    target_lang: str = "zh",
+) -> dict:
+    prompt = get_prompt_loader().render_translate(
+        text,
+        sentence,
+        source_lang=source_lang,
+        target_lang=target_lang,
+    )
+    raw_text = await chat_completion(
+        [{"role": "user", "content": prompt}],
+        temperature=0.3,
+        response_format_json=False,
+    )
+    return {"translation": (raw_text or "").strip()}

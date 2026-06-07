@@ -1,3 +1,4 @@
+import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -10,6 +11,14 @@ const outDir = process.env.EXTENSION_OUT_DIR?.trim() || 'dist'
 
 // https://vite.dev/config/
 export default defineConfig({
-  build: { outDir, emptyOutDir: true },
+  build: {
+    outDir,
+    emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        pdfViewer: resolve(__dirname, 'src/pdf-viewer/index.html'),
+      },
+    },
+  },
   plugins: [tailwindcss(), react(), crx({ manifest })],
 })

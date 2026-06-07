@@ -1,11 +1,11 @@
 /* Content script entry: exports init hook + inline UI — not Fast Refresh oriented */
 /* eslint-disable react-refresh/only-export-components */
 import { createRoot, type Root } from 'react-dom/client'
-import { useEffect, useState, type CSSProperties } from 'react'
-import { APP_NAME, LOG_PREFIX, prefixedDomId } from '../brand'
-import type { ExplainRequest, Message } from '../types'
-import { getContextSentence, siteLabel } from '../utils/dom'
-import { saveWord } from '../utils/storage'
+import { LOG_PREFIX, prefixedDomId } from '../brand'
+import {
+  FloatingMenu,
+  type FloatingMenuMode,
+} from './floatingMenu'
 
 let host: HTMLDivElement | null = null
 let reactRoot: Root | null = null
@@ -42,203 +42,12 @@ function eventPathIncludesBrandHost(e: Event): boolean {
   return Boolean(host && e.composedPath().includes(host))
 }
 
-type MenuProps = {
-  text: string
-  top: number
-  left: number
-  onDone: () => void
+export type SelectionMenuOptions = {
+  mode?: FloatingMenuMode
 }
 
-function FloatingMenu({ text, top, left, onDone }: MenuProps) {
-  const [toast, setToast] = useState<string | null>(null)
-  const [isError, setIsError] = useState(false)
-  const [explainBusy, setExplainBusy] = useState(false)
-  const [explainText, setExplainText] = useState<string | null>(null)
-
-  useEffect(() => {
-    return () => setToast(null)
-  }, [])
-
-  const handleSave = async () => {
-    const payload = {
-      word: text,
-      sentence: getContextSentence(text),
-      source_url: location.href,
-      source_site: siteLabel(),
-      source_title: document.title || undefined,
-    }
-    console.info(`${LOG_PREFIX}[Save] click → saveWord()`, {
-      word: payload.word,
-      source_site: payload.source_site,
-      source_url: payload.source_url.slice(0, 120),
-    })
-    try {
-      const result = await saveWord(payload)
-      console.info(`${LOG_PREFIX}[Save] saveWord() resolved`, {
-        id: result.id,
-        word: result.word,
-      })
-      setToast('✅ Saved!')
-      setIsError(false)
-      setTimeout(() => {
-        onDone()
-      }, 650)
-    } catch (e) {
-      console.error(`${LOG_PREFIX}[Save] saveWord() rejected`, e)
-      const tip =
-        e instanceof Error && e.message
-          ? `❌ ${e.message}`
-          : '❌ Failed'
-      setToast(tip)
-      setIsError(true)
-    }
-  }
-
-  const handleExplain = async () => {
-    setExplainBusy(true)
-    setExplainText(null)
-    try {
-      const payload: ExplainRequest = {
-        text,
-        sentence: getContextSentence(text),
-      }
-      const msg: Message<ExplainRequest> = {
-        type: 'EXPLAIN_TEXT',
-        payload,
-      }
-      const data = (await chrome.runtime.sendMessage(msg)) as {
-        explanation?: string
-        error?: string
-      }
-      if (data?.error) {
-        setToast(`❌ ${data.error}`)
-        setIsError(true)
-      } else {
-        setExplainText(data?.explanation ?? '')
-      }
-    } catch {
-      setToast('❌ Explain failed')
-      setIsError(true)
-    } finally {
-      setExplainBusy(false)
-    }
-  }
-
-  const btnStyle: CSSProperties = {
-    background: 'transparent',
-    border: 'none',
-    color: '#fff',
-    fontSize: '12px',
-    padding: '4px 8px',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-    whiteSpace: 'nowrap',
-  }
-
-  return (
-    <>
-      <div
-        style={{
-          position: 'fixed',
-          top,
-          left,
-          transform: 'translateX(-50%)',
-          zIndex: 2147483647,
-          background: '#1a1a1a',
-          borderRadius: '8px',
-          padding: '6px 4px',
-          display: 'flex',
-          gap: '4px',
-          boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
-        }}
-      >
-        <button
-          type="button"
-          title={`${APP_NAME}：保存到词汇表（勿与浏览器自带浮条混淆）`}
-          aria-label={`${APP_NAME} Save word`}
-          style={btnStyle}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = '#333'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'transparent'
-          }}
-          onClick={() => {
-            void handleSave().catch((err) => {
-              console.error(`${LOG_PREFIX}[Save] unhandled rejection`, err)
-            })
-          }}
-        >
-          💾 Save
-        </button>
-        <button
-          type="button"
-          style={{
-            ...btnStyle,
-            opacity: explainBusy ? 0.6 : 1,
-          }}
-          disabled={explainBusy}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = '#333'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'transparent'
-          }}
-          onClick={() => void handleExplain()}
-        >
-          📖 Explain
-        </button>
-      </div>
-      {explainText !== null ? (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: '72px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: 'min(420px, calc(100vw - 32px))',
-            maxHeight: '220px',
-            overflow: 'auto',
-            background: '#18181b',
-            border: '1px solid #3f3f46',
-            borderRadius: '10px',
-            padding: '12px 14px',
-            fontSize: '13px',
-            lineHeight: 1.5,
-            color: '#e4e4e7',
-            zIndex: 2147483647,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
-          }}
-        >
-          {explainText || '—'}
-        </div>
-      ) : null}
-      {toast ? (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: '24px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            background: isError ? '#7f1d1d' : '#14532d',
-            color: '#fff',
-            padding: '8px 14px',
-            borderRadius: '8px',
-            fontSize: '13px',
-            zIndex: 2147483647,
-          }}
-        >
-          {toast}
-        </div>
-      ) : null}
-    </>
-  )
-}
-
-export function initSelectionMenu() {
+export function initSelectionMenu(options: SelectionMenuOptions = {}) {
+  const { mode = 'web' } = options
   ensureShadowMount()
 
   document.addEventListener('selectionchange', updateSelectionSnapshot)
@@ -285,9 +94,7 @@ export function initSelectionMenu() {
 
       /** fixed + getBoundingClientRect 均为视口坐标，禁止再加 scrollX/Y（否则菜单会跑出屏幕） */
       const top =
-        rect.height > 0 || rect.width > 0
-          ? rect.top - 48
-          : e.clientY - 48
+        rect.height > 0 || rect.width > 0 ? rect.top - 48 : e.clientY - 48
       const left =
         rect.height > 0 || rect.width > 0
           ? rect.left + rect.width / 2
@@ -299,6 +106,7 @@ export function initSelectionMenu() {
           top={top}
           left={left}
           onDone={closeMenu}
+          mode={mode}
         />,
       )
     },

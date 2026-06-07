@@ -30,6 +30,10 @@ def _explain_version_id() -> str:
     return (os.getenv("PROMPT_VERSION_EXPLAIN") or "explain_v1").strip()
 
 
+def _translate_version_id() -> str:
+    return (os.getenv("PROMPT_VERSION_TRANSLATE") or "translate_v1").strip()
+
+
 def _read_template(filename: str) -> str:
     path = _PROMPTS_DIR / f"{filename}.txt"
     if not path.is_file():
@@ -67,6 +71,24 @@ class PromptLoader:
         return (
             template.replace("{{TEXT}}", text).replace("{{CONTEXT_BLOCK}}", block)
         )
+
+    def render_translate(
+        self,
+        text: str,
+        sentence: str = "",
+        *,
+        source_lang: str = "en",
+        target_lang: str = "zh",
+    ) -> str:
+        del source_lang, target_lang  # reserved for future locale-specific templates
+        vid = _translate_version_id()
+        template = _read_template(vid)
+        ctx = ""
+        if sentence.strip():
+            ctx = (
+                f'\nSurrounding context (same paragraph or sentence):\n"{sentence.strip()}"\n'
+            )
+        return template.replace("{{TEXT}}", text).replace("{{CONTEXT_BLOCK}}", ctx)
 
 
 _loader: PromptLoader | None = None

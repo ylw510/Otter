@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Review } from './pages/Review'
 import { Settings } from './pages/Settings'
 import { Test } from './pages/Test'
 import { WordList } from './pages/WordList'
+import { openLocalPdfFile, openPdfViewerHome } from '../utils/openPdf'
 
 type Page = 'list' | 'review' | 'settings' | 'test'
 
@@ -11,6 +12,7 @@ const navBtn =
 
 export function App() {
   const [page, setPage] = useState<Page>('list')
+  const pdfInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     void chrome.storage.session.get('openReview').then((r) => {
@@ -39,6 +41,35 @@ export function App() {
               Otter
             </h1>
             <p className="mt-0.5 text-xs text-otter-muted">{subtitle}</p>
+          </div>
+          <div className="flex shrink-0 items-center gap-1">
+            <input
+              ref={pdfInputRef}
+              type="file"
+              accept="application/pdf,.pdf"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) void openLocalPdfFile(file)
+                e.target.value = ''
+              }}
+            />
+            <button
+              type="button"
+              className="rounded-lg px-2 py-1 text-xs font-medium text-otter-muted ring-1 ring-otter-border transition-colors hover:bg-otter-surface-raised hover:text-otter-ink"
+              title="在 Otter PDF 查看器中打开"
+              onClick={() => pdfInputRef.current?.click()}
+            >
+              PDF
+            </button>
+            <button
+              type="button"
+              className="rounded-lg px-2 py-1 text-xs font-medium text-otter-muted transition-colors hover:text-otter-ink"
+              title="打开 PDF 查看器"
+              onClick={() => void openPdfViewerHome()}
+            >
+              ↗
+            </button>
           </div>
         </div>
         <nav

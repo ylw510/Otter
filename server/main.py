@@ -6,7 +6,7 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.db.database import init_db
-from app.routes import explain, review, rewrite, words
+from app.routes import explain, review, rewrite, translate, words
 
 load_dotenv()
 
@@ -50,6 +50,7 @@ api_v1 = APIRouter()
 api_v1.include_router(words.router, prefix="/words", tags=["words"])
 api_v1.include_router(rewrite.router, prefix="/rewrite", tags=["rewrite"])
 api_v1.include_router(explain.router, prefix="/explain", tags=["explain"])
+api_v1.include_router(translate.router, prefix="/translate", tags=["translate"])
 api_v1.include_router(review.router, prefix="/review", tags=["review"])
 app.include_router(api_v1, prefix="/api/v1")
 

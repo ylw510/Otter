@@ -21,6 +21,17 @@ export type Word = {
   interval?: number
 }
 
+export type TranslateRequest = {
+  text: string
+  sentence?: string
+  source_lang?: string
+  target_lang?: string
+}
+
+export type TranslateResponse = {
+  translation: string
+}
+
 export type ExplainRequest = {
   text: string
   sentence?: string
@@ -54,6 +65,7 @@ export type MessageType =
   | 'SAVE_WORD'
   | 'REWRITE_TEXT'
   | 'EXPLAIN_TEXT'
+  | 'TRANSLATE_TEXT'
   | 'GET_WORDS'
   | 'GET_REVIEW_NEXT'
   | 'SUBMIT_REVIEW'

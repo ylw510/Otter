@@ -19,3 +19,14 @@ def test_explain_prompt_with_sentence():
     p = get_prompt_loader().render_explain("bar", "Bar is here.")
     assert "bar" in p
     assert "Bar is here" in p
+
+
+def test_translate_prompt_without_sentence():
+    p = get_prompt_loader().render_translate("hello", "")
+    assert "hello" in p
+
+
+def test_translate_prompt_with_sentence():
+    p = get_prompt_loader().render_translate("world", "Hello world.")
+    assert "world" in p
+    assert "Hello world" in p

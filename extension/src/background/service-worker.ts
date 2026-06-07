@@ -9,6 +9,7 @@ import type {
   ReviewAnswer,
   RewriteRequest,
   SaveWordRequest,
+  TranslateRequest,
 } from '../types'
 
 /** Avoid hung fetch when the backend is down so popup never spins forever. */
@@ -40,6 +41,10 @@ async function handleMessage(message: Message): Promise<unknown> {
     case 'EXPLAIN_TEXT': {
       const payload = message.payload as ExplainRequest
       return client.explain(payload)
+    }
+    case 'TRANSLATE_TEXT': {
+      const payload = message.payload as TranslateRequest
+      return client.translate(payload)
     }
     case 'SAVE_WORD': {
       const payload = message.payload as SaveWordRequest

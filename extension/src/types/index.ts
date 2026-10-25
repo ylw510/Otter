@@ -50,8 +50,14 @@ export type RewriteStyle =
   | 'casual'
   | 'twitter_tech'
 
+export type UpdateWordRequest = {
+  id: string
+  translation: string
+}
+
 export type MessageType =
   | 'SAVE_WORD'
+  | 'UPDATE_WORD'
   | 'REWRITE_TEXT'
   | 'EXPLAIN_TEXT'
   | 'GET_WORDS'
@@ -86,6 +92,7 @@ export type ReviewItem = {
   word: string
   sentence?: string
   explanation?: string
+  translation?: string
 }
 
 export type ReviewAnswer = {

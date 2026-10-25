@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Message, ReviewAnswer, ReviewItem } from '../../types'
 import { raceSendMessage } from '../../utils/messaging'
+import { wordMeaning } from '../../utils/wordMeaning'
 
 const QUALITY_LABELS: Record<number, string> = {
   0: '完全不记得',
@@ -116,6 +117,8 @@ export function Review() {
     )
   }
 
+  const meaning = wordMeaning(item)
+
   return (
     <div className="flex flex-col gap-4 px-4 py-4">
       <div className="rounded-xl border border-otter-border bg-otter-surface p-4 shadow-otter-card">
@@ -127,9 +130,9 @@ export function Review() {
             {item.sentence}
           </p>
         ) : null}
-        {item.explanation ? (
+        {meaning ? (
           <p className="mt-3 border-t border-otter-border pt-3 text-sm text-otter-subtle">
-            {item.explanation}
+            {meaning}
           </p>
         ) : null}
       </div>

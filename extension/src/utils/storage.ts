@@ -1,4 +1,4 @@
-import type { Message, SaveWordRequest, Word } from '../types'
+import type { Message, SaveWordRequest, UpdateWordRequest, Word } from '../types'
 import { LOG_PREFIX } from '../brand'
 import { WORDS_STORAGE_KEY } from '../types'
 import { raceSendMessage } from './messaging'
@@ -195,6 +195,102 @@ export async function saveWord(data: {
     id: w.id,
     word: w.word,
   })
+  return w
+}
+
+async function writeWordsList(list: Word[]): Promise<void> {
+  try {
+    await chrome.storage.local.set({ [WORDS_STORAGE_KEY]: list })
+  } catch (e) {
+    if (isExtensionContextInvalidatedError(e)) {
+      throw new Error(CONTEXT_INVALID_MSG, { cause: e })
+    }
+    throw e
+  }
+}
+
+export async function updateWordLocal(
+  id: string,
+  translation: string,
+): Promise<Word> {
+  if (!isExtensionContextValid()) {
+    throw new Error(CONTEXT_INVALID_MSG)
+  }
+  const list = await readWordsFromStorage()
+  const idx = list.findIndex((w) => w.id === id)
+  if (idx === -1) {
+    throw new Error('词条不存在')
+  }
+  const trimmed = translation.trim()
+  const updated: Word = {
+    ...list[idx],
+    translation: trimmed || undefined,
+  }
+  const next = [...list]
+  next[idx] = updated
+  await writeWordsList(next)
+  return updated
+}
+
+/** 更新释义：优先 PATCH 服务端，失败则仅写本地 storage */
+export async function updateWord(
+  id: string,
+  translation: string,
+): Promise<Word> {
+  const payload: UpdateWordRequest = { id, translation }
+  const msg: Message<UpdateWordRequest> = { type: 'UPDATE_WORD', payload }
+  let res: (Word & { error?: string; status?: number }) | undefined
+  try {
+    res = (await raceSendMessage(msg)) as Word & {
+      error?: string
+      status?: number
+    }
+  } catch (e) {
+    if (!isExtensionContextValid() || isExtensionContextInvalidatedError(e)) {
+      throw new Error(CONTEXT_INVALID_MSG, { cause: e })
+    }
+    console.warn(
+      SAVE_LOG,
+      'updateWord sendMessage failed → local only',
+      e instanceof Error ? e.message : e,
+    )
+    return updateWordLocal(id, translation)
+  }
+
+  if (
+    res &&
+    typeof res === 'object' &&
+    'status' in res &&
+    typeof res.status === 'number'
+  ) {
+    console.warn(SAVE_LOG, 'updateWord server error → local only', {
+      status: res.status,
+    })
+    return updateWordLocal(id, translation)
+  }
+
+  if (!isWordPayload(res)) {
+    console.warn(SAVE_LOG, 'updateWord invalid payload → local only', res)
+    return updateWordLocal(id, translation)
+  }
+
+  const w = res
+  try {
+    const list = await readWordsFromStorage()
+    const idx = list.findIndex((x) => x.id === w.id)
+    if (idx === -1) {
+      await writeWordsList([w, ...list])
+    } else {
+      const next = [...list]
+      next[idx] = w
+      await writeWordsList(next)
+    }
+  } catch (e) {
+    if (isExtensionContextInvalidatedError(e)) {
+      throw new Error(CONTEXT_INVALID_MSG, { cause: e })
+    }
+    throw e
+  }
   return w
 }
 

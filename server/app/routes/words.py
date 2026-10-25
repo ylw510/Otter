@@ -1,7 +1,7 @@
 import time
 from typing import Any
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,6 +22,10 @@ class WordCreate(BaseModel):
     source_title: str | None = None
     source_site: str | None = None
     user_id: str | None = None
+
+
+class WordUpdate(BaseModel):
+    translation: str | None = None
 
 
 def row_to_dict(row: WordModel) -> dict[str, Any]:
@@ -79,3 +83,19 @@ async def list_words(session: AsyncSession = Depends(get_session)):
     )
     rows = result.scalars().all()
     return [row_to_dict(r) for r in rows]
+
+
+@router.patch("/{word_id}")
+async def update_word(
+    word_id: str,
+    body: WordUpdate,
+    session: AsyncSession = Depends(get_session),
+):
+    row = await session.get(WordModel, word_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="Word not found")
+    if body.translation is not None:
+        row.translation = body.translation.strip() or None
+    await session.commit()
+    await session.refresh(row)
+    return row_to_dict(row)

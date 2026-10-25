@@ -3,12 +3,12 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
-from sqlalchemy import func, or_, select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.database import get_session
 from app.models.word import Word as WordModel
-from app.services.review_service import calculate_next_review
+from app.services.fsrs_word_bridge import PHASE_QUEUE_PRIORITY, apply_review
 
 router = APIRouter()
 
@@ -25,28 +25,34 @@ def to_review_item(row: WordModel) -> dict[str, Any]:
         "sentence": row.sentence,
         "explanation": row.explanation,
         "translation": row.translation,
+        "phase": row.phase,
     }
+
+
+def _phase_rank(row: WordModel) -> int:
+    return PHASE_QUEUE_PRIORITY.get(row.phase or "review", 2)
 
 
 @router.get("/next")
 async def get_next_due(session: AsyncSession = Depends(get_session)):
     now_ms = int(time.time() * 1000)
-    stmt = (
-        select(WordModel)
-        .where(
-            or_(
-                WordModel.next_review_at.is_(None),
-                WordModel.next_review_at <= now_ms,
-            )
+    stmt = select(WordModel).where(
+        or_(
+            WordModel.next_review_at.is_(None),
+            WordModel.next_review_at <= now_ms,
         )
-        .order_by(func.coalesce(WordModel.next_review_at, 0).asc())
-        .limit(1)
     )
     result = await session.execute(stmt)
-    row = result.scalar_one_or_none()
-    if row is None:
+    rows = result.scalars().all()
+    if not rows:
         return {"item": None}
-    return {"item": to_review_item(row)}
+    rows.sort(
+        key=lambda r: (
+            _phase_rank(r),
+            r.next_review_at if r.next_review_at is not None else 0,
+        )
+    )
+    return {"item": to_review_item(rows[0])}
 
 
 @router.post("/answer")
@@ -59,16 +65,7 @@ async def submit_answer(
         raise HTTPException(status_code=404, detail="Word not found")
 
     now_ms = int(time.time() * 1000)
-    new_days, new_ease, new_rc = calculate_next_review(
-        body.quality,
-        float(row.ease_factor),
-        int(row.interval),
-        int(row.review_count),
-    )
-    row.review_count = new_rc
-    row.ease_factor = new_ease
-    row.interval = new_days
-    row.next_review_at = now_ms + new_days * 86400000
+    apply_review(row, body.quality, now_ms)
 
     await session.commit()
     await session.refresh(row)
@@ -76,6 +73,15 @@ async def submit_answer(
 
 
 def row_to_public(row: WordModel) -> dict[str, Any]:
+    fsrs_card = None
+    if row.fsrs_card_json:
+        import json
+
+        try:
+            fsrs_card = json.loads(row.fsrs_card_json)
+        except json.JSONDecodeError:
+            fsrs_card = None
+
     return {
         "id": row.id,
         "word": row.word,
@@ -90,4 +96,9 @@ def row_to_public(row: WordModel) -> dict[str, Any]:
         "next_review_at": row.next_review_at,
         "ease_factor": row.ease_factor,
         "interval": row.interval,
+        "phase": row.phase,
+        "learning_step": row.learning_step,
+        "last_review_at": row.last_review_at,
+        "scheduler": row.scheduler,
+        "fsrs_card": fsrs_card,
     }

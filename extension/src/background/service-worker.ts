@@ -1,8 +1,18 @@
-import { API_PREFIX } from '../api/version'
 import { createBackendClient } from '../backend'
 import { LOG_PREFIX } from '../brand'
 import { loadAppConfig } from '../config/appConfig'
-import { DEFAULT_LOCAL_API_BASE } from '../constants'
+import {
+  trySyncSaveWord,
+  trySyncUpdateWord,
+} from './optionalServerSync'
+import {
+  createWord,
+  getNextDueReview,
+  listWords,
+  submitReviewAnswer,
+  updateWordTranslation,
+} from '../repository/wordRepository'
+import { notifyWordsChanged } from './wordsChanged'
 import type {
   ExplainRequest,
   Message,
@@ -44,59 +54,33 @@ async function handleMessage(message: Message): Promise<unknown> {
     }
     case 'SAVE_WORD': {
       const payload = message.payload as SaveWordRequest
-      const base = (
-        cfg.apiBaseUrl?.trim() || DEFAULT_LOCAL_API_BASE
-      ).replace(/\/$/, '')
-      const url = `${base}${API_PREFIX}/words`
-      console.info(`${SAVE_LOG} POST`, url, {
-        word: payload.word,
-        source_site: payload.source_site,
+      const word = await createWord(payload)
+      notifyWordsChanged()
+      console.info(SAVE_LOG, 'stored in IndexedDB', {
+        id: word.id,
+        word: word.word,
       })
-      try {
-        const out = await client.saveWord(payload)
-        if (
-          out &&
-          typeof out === 'object' &&
-          'status' in out &&
-          typeof (out as { status?: unknown }).status === 'number'
-        ) {
-          const e = out as { status: number; error?: string }
-          console.warn(`${SAVE_LOG} HTTP not OK`, {
-            url,
-            status: e.status,
-            body: e.error?.length ? e.error.slice(0, 400) : '(empty)',
-          })
-        } else if (
-          out &&
-          typeof out === 'object' &&
-          'id' in out &&
-          'word' in out
-        ) {
-          const w = out as { id: string; word: string }
-          console.info(`${SAVE_LOG} HTTP OK`, {
-            id: w.id,
-            word: w.word,
-          })
-        } else {
-          console.warn(`${SAVE_LOG} unexpected response shape`, out)
-        }
-        return out
-      } catch (e) {
-        console.error(`${SAVE_LOG} request failed`, url, e)
-        throw e
-      }
+      void trySyncSaveWord(word, payload)
+      return word
     }
     case 'UPDATE_WORD': {
       const payload = message.payload as UpdateWordRequest
-      return client.updateWord(payload)
+      const word = await updateWordTranslation(payload.id, payload.translation)
+      notifyWordsChanged()
+      void trySyncUpdateWord(payload)
+      return word
     }
     case 'GET_WORDS':
-      return client.getWords()
-    case 'GET_REVIEW_NEXT':
-      return client.getReviewNext()
+      return listWords()
+    case 'GET_REVIEW_NEXT': {
+      const item = await getNextDueReview()
+      return { item }
+    }
     case 'SUBMIT_REVIEW': {
       const payload = message.payload as ReviewAnswer
-      return client.submitReview(payload)
+      const word = await submitReviewAnswer(payload)
+      notifyWordsChanged()
+      return word
     }
     default:
       return { error: 'Unknown message type' }
@@ -105,6 +89,14 @@ async function handleMessage(message: Message): Promise<unknown> {
 
 chrome.runtime.onMessage.addListener(
   (message: Message, _s, sendResponse) => {
+    if (
+      message &&
+      typeof message === 'object' &&
+      'type' in message &&
+      (message as { type: string }).type === 'WORDS_CHANGED'
+    ) {
+      return false
+    }
     void handleMessage(message)
       .then(sendResponse)
       .catch((e: unknown) => {

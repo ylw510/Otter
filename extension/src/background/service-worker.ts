@@ -8,7 +8,9 @@ import {
 import {
   createWord,
   getNextDueReview,
+  getReviewStats,
   listWords,
+  previewReviewById,
   submitReviewAnswer,
   updateWordTranslation,
 } from '../repository/wordRepository'
@@ -18,6 +20,7 @@ import type {
   Message,
   ReviewAnswer,
   RewriteRequest,
+  PreviewReviewRequest,
   SaveWordRequest,
   UpdateWordRequest,
 } from '../types'
@@ -75,6 +78,13 @@ async function handleMessage(message: Message): Promise<unknown> {
     case 'GET_REVIEW_NEXT': {
       const item = await getNextDueReview()
       return { item }
+    }
+    case 'GET_REVIEW_STATS':
+      return getReviewStats()
+    case 'PREVIEW_REVIEW': {
+      const payload = message.payload as PreviewReviewRequest
+      const outcomes = await previewReviewById(payload.word_id)
+      return { outcomes }
     }
     case 'SUBMIT_REVIEW': {
       const payload = message.payload as ReviewAnswer

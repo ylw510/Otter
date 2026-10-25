@@ -1,5 +1,6 @@
 import { otterDb } from '../db/otterDb'
 import { calculateNextReview } from '../review/calculateNextReview'
+import { ratingToQuality } from '../review/rating'
 import type {
   ReviewAnswer,
   ReviewItem,
@@ -76,8 +77,9 @@ export async function submitReviewAnswer(
   }
   const now = Date.now()
   const interval = row.interval ?? 1
+  const quality = ratingToQuality(payload.rating)
   const [newDays, newEase, newRc] = calculateNextReview(
-    payload.quality,
+    quality,
     row.ease_factor,
     interval,
     row.review_count,

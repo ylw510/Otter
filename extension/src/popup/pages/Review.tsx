@@ -1,31 +1,36 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { Message, ReviewAnswer, ReviewItem } from '../../types'
+import type { Message, ReviewAnswer, ReviewItem, ReviewRating } from '../../types'
 import { raceSendMessage } from '../../utils/messaging'
 import { wordMeaning } from '../../utils/wordMeaning'
-
-const QUALITY_LABELS: Record<number, string> = {
-  0: '完全不记得',
-  1: '很难想起',
-  2: '吃力',
-  3: '勉强',
-  4: '顺利',
-  5: '很轻松',
-}
+import {
+  REVIEW_RATING_LABELS,
+  REVIEW_RATINGS,
+} from '../../review/rating'
 
 const btnPrimary =
-  'rounded-lg bg-otter-accent px-3 py-2 text-sm font-medium text-white shadow-otter-sm transition-colors hover:bg-otter-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-otter-ring focus-visible:ring-offset-2 focus-visible:ring-offset-otter-canvas'
+  'rounded-lg bg-otter-accent px-3 py-2 text-sm font-medium text-white shadow-otter-sm transition-colors hover:bg-otter-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-otter-ring focus-visible:ring-offset-2 focus-visible:ring-offset-otter-canvas disabled:opacity-50'
 
-const btnGhost =
-  'rounded-lg border border-otter-border bg-otter-surface-raised px-2 py-2 text-left text-xs text-otter-ink transition-colors hover:border-otter-border-strong hover:bg-otter-surface disabled:opacity-50'
+const ratingBtnBase =
+  'rounded-lg border px-2 py-2.5 text-left text-xs transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-otter-ring disabled:opacity-50'
+
+const ratingStyles: Record<ReviewRating, string> = {
+  again:
+    'border-red-200 bg-otter-danger-bg text-otter-danger hover:border-red-300',
+  hard: 'border-otter-border bg-otter-surface-raised text-otter-ink hover:border-otter-border-strong',
+  good: 'border-otter-accent/30 bg-otter-surface text-otter-ink hover:border-otter-accent/50',
+  easy: 'border-emerald-200 bg-emerald-50 text-emerald-900 hover:border-emerald-300',
+}
 
 export function Review() {
   const [loading, setLoading] = useState(true)
   const [item, setItem] = useState<ReviewItem | null>(null)
+  const [revealed, setRevealed] = useState(false)
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
 
   const loadNext = useCallback(async (opts?: { silent?: boolean }) => {
     setErr(null)
+    setRevealed(false)
     if (!opts?.silent) setLoading(true)
     try {
       const msg: Message = { type: 'GET_REVIEW_NEXT', payload: {} }
@@ -53,12 +58,12 @@ export function Review() {
     })
   }, [loadNext])
 
-  const submit = async (quality: ReviewAnswer['quality']) => {
-    if (!item) return
+  const submit = async (rating: ReviewRating) => {
+    if (!item || !revealed) return
     setBusy(true)
     setErr(null)
     try {
-      const payload: ReviewAnswer = { word_id: item.word_id, quality }
+      const payload: ReviewAnswer = { word_id: item.word_id, rating }
       const msg: Message<ReviewAnswer> = {
         type: 'SUBMIT_REVIEW',
         payload,
@@ -122,7 +127,10 @@ export function Review() {
   return (
     <div className="flex flex-col gap-4 px-4 py-4">
       <div className="rounded-xl border border-otter-border bg-otter-surface p-4 shadow-otter-card">
-        <div className="text-lg font-semibold leading-snug text-otter-ink">
+        <p className="text-[11px] font-medium uppercase tracking-wide text-otter-subtle">
+          {revealed ? '答案' : '回忆这个词的意思'}
+        </p>
+        <div className="mt-2 text-lg font-semibold leading-snug text-otter-ink">
           {item.word}
         </div>
         {item.sentence ? (
@@ -130,33 +138,53 @@ export function Review() {
             {item.sentence}
           </p>
         ) : null}
-        {meaning ? (
-          <p className="mt-3 border-t border-otter-border pt-3 text-sm text-otter-subtle">
-            {meaning}
-          </p>
+        {revealed ? (
+          <div className="mt-3 border-t border-otter-border pt-3">
+            {meaning ? (
+              <p className="text-sm leading-relaxed text-otter-ink">{meaning}</p>
+            ) : (
+              <p className="text-sm italic text-otter-subtle">
+                暂无释义，可在「词汇」里添加。
+              </p>
+            )}
+          </div>
         ) : null}
       </div>
-      <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-otter-subtle">
-          记忆程度（0–5）
-        </p>
-        <div className="grid grid-cols-2 gap-2">
-          {([0, 1, 2, 3, 4, 5] as const).map((q) => (
-            <button
-              key={q}
-              type="button"
-              disabled={busy}
-              className={`${btnGhost} focus:outline-none focus-visible:ring-2 focus-visible:ring-otter-ring`}
-              onClick={() => void submit(q)}
-            >
-              <span className="font-mono font-semibold text-otter-accent">
-                {q}
-              </span>{' '}
-              {QUALITY_LABELS[q]}
-            </button>
-          ))}
+
+      {!revealed ? (
+        <button
+          type="button"
+          className={btnPrimary}
+          onClick={() => setRevealed(true)}
+        >
+          显示答案
+        </button>
+      ) : (
+        <div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-otter-subtle">
+            你记得怎么样？
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            {REVIEW_RATINGS.map((rating) => {
+              const { title, hint } = REVIEW_RATING_LABELS[rating]
+              return (
+                <button
+                  key={rating}
+                  type="button"
+                  disabled={busy}
+                  className={`${ratingBtnBase} ${ratingStyles[rating]}`}
+                  onClick={() => void submit(rating)}
+                >
+                  <span className="font-semibold">{title}</span>
+                  <span className="mt-0.5 block text-[11px] opacity-80">
+                    {hint}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

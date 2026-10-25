@@ -24,6 +24,7 @@ def to_review_item(row: WordModel) -> dict[str, Any]:
         "word": row.word,
         "sentence": row.sentence,
         "explanation": row.explanation,
+        "translation": row.translation,
     }
 
 

@@ -8,6 +8,7 @@ import type {
   RewriteResponse,
   ReviewAnswer,
   SaveWordRequest,
+  UpdateWordRequest,
   Word,
 } from '../types'
 
@@ -24,6 +25,7 @@ export interface BackendClient {
   rewrite(input: RewriteRequest): Promise<unknown>
   explain(input: ExplainRequest): Promise<unknown>
   saveWord(input: SaveWordRequest): Promise<unknown>
+  updateWord(input: UpdateWordRequest): Promise<unknown>
 }
 
 /** Service worker also proxies list/review endpoints (same backend surface). */
@@ -94,6 +96,20 @@ class BaseHttpBackendClient implements HttpBackendClient {
     return this.parseResponse(res)
   }
 
+  private async patch(path: string, body: unknown): Promise<unknown> {
+    const url = `${this.resolveBaseUrl()}${path}`
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...this.baseHeaders(),
+    }
+    const res = await this.fetchWithTimeout(url, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify(body),
+    })
+    return this.parseResponse(res)
+  }
+
   async rewrite(input: RewriteRequest): Promise<RewriteResponse> {
     return this.post(`${API_PREFIX}/rewrite`, {
       text: input.text,
@@ -115,6 +131,12 @@ class BaseHttpBackendClient implements HttpBackendClient {
       source_url: input.source_url,
       source_site: input.source_site,
       source_title: input.source_title,
+    }) as Promise<Word>
+  }
+
+  async updateWord(input: UpdateWordRequest): Promise<Word> {
+    return this.patch(`${API_PREFIX}/words/${encodeURIComponent(input.id)}`, {
+      translation: input.translation,
     }) as Promise<Word>
   }
 

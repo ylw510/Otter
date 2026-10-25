@@ -9,6 +9,7 @@ import type {
   ReviewAnswer,
   RewriteRequest,
   SaveWordRequest,
+  UpdateWordRequest,
 } from '../types'
 
 /** Avoid hung fetch when the backend is down so popup never spins forever. */
@@ -84,6 +85,10 @@ async function handleMessage(message: Message): Promise<unknown> {
         console.error(`${SAVE_LOG} request failed`, url, e)
         throw e
       }
+    }
+    case 'UPDATE_WORD': {
+      const payload = message.payload as UpdateWordRequest
+      return client.updateWord(payload)
     }
     case 'GET_WORDS':
       return client.getWords()

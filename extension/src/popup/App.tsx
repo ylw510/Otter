@@ -25,7 +25,7 @@ export function App() {
     page === 'list'
       ? '已保存的词汇'
       : page === 'review'
-        ? '间隔复习 SM-2'
+        ? '间隔复习 FSRS'
         : page === 'settings'
           ? '设置'
           : '调试'

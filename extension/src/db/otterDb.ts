@@ -26,6 +26,9 @@ export class OtterDatabase extends Dexie {
             }
           })
       })
+    this.version(3).stores({
+      words: 'id, created_at, next_review_at, word, phase',
+    })
   }
 }
 

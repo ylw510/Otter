@@ -17,7 +17,8 @@
   "dependencies": {
     "dexie": "^4.4.7",
     "react": "^19.2.5",
-    "react-dom": "^19.2.5"
+    "react-dom": "^19.2.5",
+    "ts-fsrs": "^5.4.2"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.4.0",

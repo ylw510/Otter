@@ -1,4 +1,18 @@
+import { Rating, type Grade } from 'ts-fsrs'
 import type { ReviewRating } from '../types'
+
+export function ratingToFsrsGrade(rating: ReviewRating): Grade {
+  switch (rating) {
+    case 'again':
+      return Rating.Again
+    case 'hard':
+      return Rating.Hard
+    case 'good':
+      return Rating.Good
+    case 'easy':
+      return Rating.Easy
+  }
+}
 
 /** Map Anki-style four buttons to SM-2 quality (0–5). */
 export function ratingToQuality(rating: ReviewRating): 0 | 1 | 2 | 3 | 4 | 5 {

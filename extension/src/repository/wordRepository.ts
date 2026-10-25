@@ -1,4 +1,5 @@
 import { DEFAULT_NEW_WORD_PHASE, otterDb } from '../db/otterDb'
+import { initWordFsrsCard } from '../review/fsrsCardBridge'
 import { applyReviewRating, PHASE_QUEUE_PRIORITY } from '../review/applyReviewRating'
 import { previewReviewOutcomes } from '../review/previewReviewOutcomes'
 import type {
@@ -24,6 +25,7 @@ export function wordToReviewItem(row: Word): ReviewItem {
 
 export async function createWord(input: SaveWordRequest): Promise<Word> {
   const now = Date.now()
+  const fsrs_card = initWordFsrsCard(new Date(now))
   const word: Word = {
     id: crypto.randomUUID(),
     word: input.word,
@@ -37,7 +39,9 @@ export async function createWord(input: SaveWordRequest): Promise<Word> {
     interval: 1,
     phase: DEFAULT_NEW_WORD_PHASE,
     learning_step: 0,
-    next_review_at: now,
+    next_review_at: fsrs_card.due,
+    scheduler: 'fsrs',
+    fsrs_card,
   }
   await otterDb.words.put(word)
   return word

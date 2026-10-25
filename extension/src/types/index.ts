@@ -5,6 +5,18 @@ export type BackendMode = 'local' | 'hosted'
 
 export type WordPhase = 'learning' | 'review' | 'relearning'
 
+export type FsrsCardSnapshot = {
+  due: number
+  stability: number
+  difficulty: number
+  scheduled_days: number
+  learning_steps: number
+  reps: number
+  lapses: number
+  state: number
+  last_review?: number
+}
+
 export type Word = {
   id: string
   user_id?: string
@@ -21,10 +33,13 @@ export type Word = {
   next_review_at?: number
   ease_factor: number
   interval?: number
-  /** Short-step scheduling before SM-2 review phase. */
   phase?: WordPhase
   learning_step?: number
   last_review_at?: number
+  /** Present when scheduled with FSRS (ts-fsrs). */
+  scheduler?: 'fsrs'
+  fsrs_card?: FsrsCardSnapshot
+  lapses?: number
 }
 
 export type ExplainRequest = {

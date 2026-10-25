@@ -8,6 +8,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.database import get_session
 from app.models.word import Word as WordModel
+from app.services.fsrs_word_bridge import (
+    datetime_to_ms,
+    init_fsrs_card_json,
+    state_to_phase,
+)
+from fsrs import Card
 
 router = APIRouter()
 
@@ -29,6 +35,15 @@ class WordUpdate(BaseModel):
 
 
 def row_to_dict(row: WordModel) -> dict[str, Any]:
+    fsrs_card = None
+    if row.fsrs_card_json:
+        import json
+
+        try:
+            fsrs_card = json.loads(row.fsrs_card_json)
+        except json.JSONDecodeError:
+            fsrs_card = None
+
     return {
         "id": row.id,
         "user_id": row.user_id,
@@ -45,6 +60,11 @@ def row_to_dict(row: WordModel) -> dict[str, Any]:
         "next_review_at": row.next_review_at,
         "ease_factor": row.ease_factor,
         "interval": row.interval,
+        "phase": row.phase,
+        "learning_step": row.learning_step,
+        "last_review_at": row.last_review_at,
+        "scheduler": row.scheduler,
+        "fsrs_card": fsrs_card,
     }
 
 
@@ -55,6 +75,8 @@ async def create_word(
 ):
     now_ms = int(time.time() * 1000)
     ctx = body.context_sentence or body.sentence
+    fsrs_json = init_fsrs_card_json(now_ms)
+    card = Card.from_json(fsrs_json)
     row = WordModel(
         user_id=body.user_id,
         word=body.word,
@@ -65,10 +87,14 @@ async def create_word(
         source_url=body.source_url,
         source_title=body.source_title,
         source_site=body.source_site,
-        next_review_at=now_ms,
+        next_review_at=datetime_to_ms(card.due),
         review_count=0,
         interval=1,
         ease_factor=2.5,
+        phase=state_to_phase(card.state),
+        learning_step=card.step,
+        scheduler="fsrs",
+        fsrs_card_json=fsrs_json,
     )
     session.add(row)
     await session.commit()

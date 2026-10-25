@@ -12,4 +12,4 @@
 
 ## 扩展侧存储
 
-词条与复习调度保存在扩展 **IndexedDB**（`otter` 数据库，`words` 表），由 Service Worker 统一读写；复习间隔由 **FSRS**（`ts-fsrs`，快照字段 `fsrs_card`）计算。`chrome.storage.local` 仅用于应用配置。服务端为可选同步与 AI 能力，非词表前置条件（服务端 `/review` 仍为 SM-2，与扩展调度独立）。
+词条与复习调度保存在扩展 **IndexedDB**（`otter` 数据库，`words` 表），由 Service Worker 统一读写；复习间隔由 **FSRS**（npm `ts-fsrs`，字段 `fsrs_card`）计算。服务端 SQLite `words.fsrs_card_json` 使用同一算法的 Python 实现（PyPI `fsrs` / py-fsrs）。`chrome.storage.local` 仅用于应用配置。

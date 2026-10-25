@@ -34,6 +34,18 @@ def _sqlite_migrate_words_sync(connection) -> None:
         statements.append("ALTER TABLE words ADD COLUMN user_id VARCHAR")
     if "context_sentence" not in cols:
         statements.append("ALTER TABLE words ADD COLUMN context_sentence TEXT")
+    if "phase" not in cols:
+        statements.append("ALTER TABLE words ADD COLUMN phase VARCHAR")
+    if "learning_step" not in cols:
+        statements.append("ALTER TABLE words ADD COLUMN learning_step INTEGER")
+    if "last_review_at" not in cols:
+        statements.append("ALTER TABLE words ADD COLUMN last_review_at INTEGER")
+    if "lapses" not in cols:
+        statements.append("ALTER TABLE words ADD COLUMN lapses INTEGER DEFAULT 0")
+    if "scheduler" not in cols:
+        statements.append("ALTER TABLE words ADD COLUMN scheduler VARCHAR")
+    if "fsrs_card_json" not in cols:
+        statements.append("ALTER TABLE words ADD COLUMN fsrs_card_json TEXT")
     for sql in statements:
         connection.execute(text(sql))
 

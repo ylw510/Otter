@@ -1,6 +1,7 @@
 import { API_PREFIX, CLIENT_API_VERSION } from '../api/version'
 import type { AppConfig } from '../config/appConfig'
 import { DEFAULT_LOCAL_API_BASE } from '../constants'
+import { ratingToQuality } from '../review/rating'
 import type {
   ExplainRequest,
   ExplainResponse,
@@ -149,7 +150,10 @@ class BaseHttpBackendClient implements HttpBackendClient {
   }
 
   async submitReview(payload: ReviewAnswer): Promise<unknown> {
-    return this.post(`${API_PREFIX}/review/answer`, payload)
+    return this.post(`${API_PREFIX}/review/answer`, {
+      word_id: payload.word_id,
+      quality: ratingToQuality(payload.rating),
+    })
   }
 }
 

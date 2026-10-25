@@ -61,6 +61,24 @@ export type UpdateWordRequest = {
   translation: string
 }
 
+export type ReviewStats = {
+  due: number
+  learning: number
+  relearning: number
+  reviewDue: number
+  totalWords: number
+}
+
+export type PreviewReviewRequest = {
+  word_id: string
+}
+
+export type ReviewOutcomePreview = {
+  rating: ReviewRating
+  nextReviewAt: number
+  label: string
+}
+
 export type MessageType =
   | 'SAVE_WORD'
   | 'UPDATE_WORD'
@@ -68,6 +86,8 @@ export type MessageType =
   | 'EXPLAIN_TEXT'
   | 'GET_WORDS'
   | 'GET_REVIEW_NEXT'
+  | 'GET_REVIEW_STATS'
+  | 'PREVIEW_REVIEW'
   | 'SUBMIT_REVIEW'
 
 export type Message<T = unknown> = {

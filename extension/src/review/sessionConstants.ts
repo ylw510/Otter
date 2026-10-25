@@ -1,0 +1,1 @@
+export const REVIEW_SESSION_LIMIT = 20

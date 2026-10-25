@@ -1,8 +1,11 @@
 import { DEFAULT_NEW_WORD_PHASE, otterDb } from '../db/otterDb'
 import { applyReviewRating, PHASE_QUEUE_PRIORITY } from '../review/applyReviewRating'
+import { previewReviewOutcomes } from '../review/previewReviewOutcomes'
 import type {
   ReviewAnswer,
   ReviewItem,
+  ReviewOutcomePreview,
+  ReviewStats,
   SaveWordRequest,
   Word,
   WordPhase,
@@ -103,4 +106,47 @@ export async function submitReviewAnswer(
 
 export async function getWordById(id: string): Promise<Word | undefined> {
   return otterDb.words.get(id)
+}
+
+export async function getReviewStats(): Promise<ReviewStats> {
+  const now = Date.now()
+  const all = await otterDb.words.toArray()
+  let due = 0
+  let learning = 0
+  let relearning = 0
+  let reviewDue = 0
+
+  for (const w of all) {
+    const p = phaseOf(w)
+    if (p === 'learning') {
+      learning += 1
+    } else if (p === 'relearning') {
+      relearning += 1
+    }
+    const isDue = (w.next_review_at ?? 0) <= now
+    if (isDue) {
+      due += 1
+      if (p === 'review') {
+        reviewDue += 1
+      }
+    }
+  }
+
+  return {
+    due,
+    learning,
+    relearning,
+    reviewDue,
+    totalWords: all.length,
+  }
+}
+
+export async function previewReviewById(
+  wordId: string,
+): Promise<ReviewOutcomePreview[]> {
+  const row = await otterDb.words.get(wordId)
+  if (!row) {
+    throw new Error('词条不存在')
+  }
+  return previewReviewOutcomes(row)
 }

@@ -78,8 +78,6 @@ export type RewriteResponse = {
   results: RewriteResult[]
 }
 
-export const WORDS_STORAGE_KEY = 'copilot_words' as const
-
 export const DEFAULT_STYLES: RewriteStyle[] = [
   'professional',
   'native',

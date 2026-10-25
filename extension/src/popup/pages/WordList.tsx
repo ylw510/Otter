@@ -1,12 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { Word } from '../../types'
-import { WORDS_STORAGE_KEY } from '../../types'
 import { getWords } from '../../utils/storage'
 import { WordCard } from '../components/WordCard'
 
 export function WordList() {
   const [words, setWords] = useState<Word[]>([])
   const [loading, setLoading] = useState(true)
+
+  const reload = useCallback(async () => {
+    const list = await getWords()
+    setWords(list)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -21,22 +25,23 @@ export function WordList() {
         if (!cancelled) setLoading(false)
       })
 
-    const listener = (
-      changes: Record<string, chrome.storage.StorageChange>,
-      areaName: string,
-    ) => {
-      if (areaName !== 'local') return
-      if (!changes[WORDS_STORAGE_KEY]) return
-      const next = changes[WORDS_STORAGE_KEY].newValue as Word[] | undefined
-      setWords(next ?? [])
+    const onMessage = (msg: unknown) => {
+      if (
+        msg &&
+        typeof msg === 'object' &&
+        'type' in msg &&
+        (msg as { type: string }).type === 'WORDS_CHANGED'
+      ) {
+        void reload()
+      }
     }
 
-    chrome.storage.onChanged.addListener(listener)
+    chrome.runtime.onMessage.addListener(onMessage)
     return () => {
       cancelled = true
-      chrome.storage.onChanged.removeListener(listener)
+      chrome.runtime.onMessage.removeListener(onMessage)
     }
-  }, [])
+  }, [reload])
 
   if (loading) {
     return (

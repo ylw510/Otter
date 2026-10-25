@@ -10,6 +10,6 @@
 - `rewrite_history`：原文、改写结果、风格、站点、创建时间
 - `user_preferences`：为未来账号/同步偏好预留
 
-## 扩展侧镜像
+## 扩展侧存储
 
-扩展会将词表缓存到 `chrome.storage.local` 用于离线体验；服务端可用时仍是主数据源。
+词条与复习调度保存在扩展 **IndexedDB**（`otter` 数据库，`words` 表），由 Service Worker 统一读写。`chrome.storage.local` 仅用于应用配置。服务端为可选同步与 AI 能力，非词表前置条件。

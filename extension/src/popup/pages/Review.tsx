@@ -16,6 +16,7 @@ import {
 import { REVIEW_SESSION_LIMIT } from '../../review/sessionConstants'
 import { raceSendMessage } from '../../utils/messaging'
 import { wordMeaning } from '../../utils/wordMeaning'
+import { SpeakButton } from '../components/SpeakButton'
 
 const btnPrimary =
   'rounded-lg bg-otter-accent px-3 py-2 text-sm font-medium text-white shadow-otter-sm transition-colors hover:bg-otter-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-otter-ring focus-visible:ring-offset-2 focus-visible:ring-offset-otter-canvas disabled:opacity-50'
@@ -304,8 +305,11 @@ export function Review() {
               <span className="mx-1.5 text-otter-border">·</span>
               {revealed ? '答案' : '回忆这个词的意思'}
             </p>
-            <div className="mt-2 text-lg font-semibold leading-snug text-otter-ink">
-              {item.word}
+            <div className="mt-2 flex items-center gap-2">
+              <div className="min-w-0 flex-1 text-lg font-semibold leading-snug text-otter-ink">
+                {item.word}
+              </div>
+              <SpeakButton text={item.word} className="p-1.5" />
             </div>
             {item.sentence ? (
               <p className="mt-3 text-sm leading-relaxed text-otter-muted">

@@ -3,6 +3,7 @@ import type { Word } from '../../types'
 import { appendReturnHighlightUrl } from '../../utils/appendReturnHighlightUrl'
 import { updateWord } from '../../utils/storage'
 import { wordMeaning } from '../../utils/wordMeaning'
+import { SpeakButton } from './SpeakButton'
 
 type Props = { word: Word }
 
@@ -44,7 +45,12 @@ export function WordCard({ word }: Props) {
 
   return (
     <article className="rounded-xl border border-otter-border bg-otter-surface px-3 py-2.5 shadow-otter-sm transition-shadow duration-150 hover:shadow-otter-card">
-      <div className="font-semibold text-otter-ink">{word.word}</div>
+      <div className="flex items-center gap-2">
+        <div className="min-w-0 flex-1 font-semibold text-otter-ink">
+          {word.word}
+        </div>
+        <SpeakButton text={word.word} />
+      </div>
       {word.sentence ? (
         <p className="mt-1 text-xs leading-relaxed text-otter-muted">
           {word.sentence}

@@ -93,7 +93,9 @@ export type ReviewItem = {
   translation?: string
 }
 
+export type ReviewRating = 'again' | 'hard' | 'good' | 'easy'
+
 export type ReviewAnswer = {
   word_id: string
-  quality: 0 | 1 | 2 | 3 | 4 | 5
+  rating: ReviewRating
 }

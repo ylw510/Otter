@@ -3,6 +3,8 @@
 
 export type BackendMode = 'local' | 'hosted'
 
+export type WordPhase = 'learning' | 'review' | 'relearning'
+
 export type Word = {
   id: string
   user_id?: string
@@ -19,6 +21,10 @@ export type Word = {
   next_review_at?: number
   ease_factor: number
   interval?: number
+  /** Short-step scheduling before SM-2 review phase. */
+  phase?: WordPhase
+  learning_step?: number
+  last_review_at?: number
 }
 
 export type ExplainRequest = {
@@ -91,6 +97,7 @@ export type ReviewItem = {
   sentence?: string
   explanation?: string
   translation?: string
+  phase?: WordPhase
 }
 
 export type ReviewRating = 'again' | 'hard' | 'good' | 'easy'

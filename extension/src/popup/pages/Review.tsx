@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { Message, ReviewAnswer, ReviewItem, ReviewRating } from '../../types'
+import type {
+  Message,
+  ReviewAnswer,
+  ReviewItem,
+  ReviewRating,
+  WordPhase,
+} from '../../types'
 import { raceSendMessage } from '../../utils/messaging'
 import { wordMeaning } from '../../utils/wordMeaning'
 import {
@@ -12,6 +18,17 @@ const btnPrimary =
 
 const ratingBtnBase =
   'rounded-lg border px-2 py-2.5 text-left text-xs transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-otter-ring disabled:opacity-50'
+
+function reviewPhaseLabel(phase: WordPhase | undefined): string {
+  switch (phase ?? 'review') {
+    case 'learning':
+      return '新词 · 学习中'
+    case 'relearning':
+      return '重新学习'
+    default:
+      return '复习'
+  }
+}
 
 const ratingStyles: Record<ReviewRating, string> = {
   again:
@@ -123,11 +140,14 @@ export function Review() {
   }
 
   const meaning = wordMeaning(item)
+  const phaseLabel = reviewPhaseLabel(item.phase)
 
   return (
     <div className="flex flex-col gap-4 px-4 py-4">
       <div className="rounded-xl border border-otter-border bg-otter-surface p-4 shadow-otter-card">
         <p className="text-[11px] font-medium uppercase tracking-wide text-otter-subtle">
+          {phaseLabel}
+          <span className="mx-1.5 text-otter-border">·</span>
           {revealed ? '答案' : '回忆这个词的意思'}
         </p>
         <div className="mt-2 text-lg font-semibold leading-snug text-otter-ink">

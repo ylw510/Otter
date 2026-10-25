@@ -1,11 +1,11 @@
-import { otterDb } from '../db/otterDb'
-import { calculateNextReview } from '../review/calculateNextReview'
-import { ratingToQuality } from '../review/rating'
+import { DEFAULT_NEW_WORD_PHASE, otterDb } from '../db/otterDb'
+import { applyReviewRating, PHASE_QUEUE_PRIORITY } from '../review/applyReviewRating'
 import type {
   ReviewAnswer,
   ReviewItem,
   SaveWordRequest,
   Word,
+  WordPhase,
 } from '../types'
 
 export function wordToReviewItem(row: Word): ReviewItem {
@@ -15,6 +15,7 @@ export function wordToReviewItem(row: Word): ReviewItem {
     sentence: row.sentence,
     explanation: row.explanation,
     translation: row.translation,
+    phase: row.phase,
   }
 }
 
@@ -31,6 +32,8 @@ export async function createWord(input: SaveWordRequest): Promise<Word> {
     review_count: 0,
     ease_factor: 2.5,
     interval: 1,
+    phase: DEFAULT_NEW_WORD_PHASE,
+    learning_step: 0,
     next_review_at: now,
   }
   await otterDb.words.put(word)
@@ -58,14 +61,31 @@ export async function updateWordTranslation(
   return updated
 }
 
+function phaseOf(word: Word): WordPhase {
+  return word.phase ?? 'review'
+}
+
 export async function getNextDueReview(): Promise<ReviewItem | null> {
   const now = Date.now()
-  const row = await otterDb.words
+  const due = await otterDb.words
     .where('next_review_at')
     .belowOrEqual(now)
-    .sortBy('next_review_at')
-  const first = row[0]
-  return first ? wordToReviewItem(first) : null
+    .toArray()
+
+  if (due.length === 0) {
+    return null
+  }
+
+  due.sort((a, b) => {
+    const pa = PHASE_QUEUE_PRIORITY[phaseOf(a)]
+    const pb = PHASE_QUEUE_PRIORITY[phaseOf(b)]
+    if (pa !== pb) {
+      return pa - pb
+    }
+    return (a.next_review_at ?? 0) - (b.next_review_at ?? 0)
+  })
+
+  return wordToReviewItem(due[0]!)
 }
 
 export async function submitReviewAnswer(
@@ -76,21 +96,7 @@ export async function submitReviewAnswer(
     throw new Error('词条不存在')
   }
   const now = Date.now()
-  const interval = row.interval ?? 1
-  const quality = ratingToQuality(payload.rating)
-  const [newDays, newEase, newRc] = calculateNextReview(
-    quality,
-    row.ease_factor,
-    interval,
-    row.review_count,
-  )
-  const updated: Word = {
-    ...row,
-    review_count: newRc,
-    ease_factor: newEase,
-    interval: newDays,
-    next_review_at: now + newDays * 86_400_000,
-  }
+  const updated = applyReviewRating(row, payload.rating, now)
   await otterDb.words.put(updated)
   return updated
 }
